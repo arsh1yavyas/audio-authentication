@@ -38,4 +38,14 @@ Preprocessing of audio deeppfakes means getting useful features in speech record
 Their data preprocessing pipeline:
     1. STFT - converts time-domain signal into frequency-domain 2D rep, by preserving time and frequency info through the Fourier Transform to short, overlapping pieces of a signal. This helps CNNS which use structured 2D reps for pattern recognition a lot.
     2. MFCCs - spectral envelope of audio stream, related to how people perceive speech, RNNs and LSTM networks are tasked with detecting time-series data's sequential relationships. RNN can learn temporal patterns and anomalies in simulated speech since MFCCs retain phonetic and speech structure
-    3. 1D Statistical Feature Vectors - they extracted 6 features: ZCR (provides details on speech texture), Root Mean Square (RMS) Energy captures global loudness and amplitude variations of signal, measured pitch of sound is related to the center of mass of the spectrum, or spectral centroid. Measurement of frequencies cluster about the spectral centroid, indicates signal's richness in timbre. Spectral Rolloff shows high-frequency emphasis by locating frequency point below where 85% of the energy in the spectrum is. Spectral Flatness quantifies how noise-like or tonal a signal is by comparing geometric and arighmetic means 
+    3. 1D Statistical Feature Vectors - they extracted 6 features: ZCR (provides details on speech texture), Root Mean Square (RMS) Energy captures global loudness and amplitude variations of signal, measured pitch of sound is related to the center of mass of the spectrum, or spectral centroid. Measurement of frequencies cluster about the spectral centroid, indicates signal's richness in timbre. Spectral Rolloff shows high-frequency emphasis by locating frequency point below where 85% of the energy in the spectrum is. Spectral Flatness quantifies how noise-like or tonal a signal is by comparing geometric and arithmetic means 
+
+# Research from Paper 2 and 3:
+- Random Forest Classifier Model is very good especially with using MFCC
+- For imitation deepfakes: spectral analysis
+- Replay deepfakes: speech flow disruptions, sudden background noise change and emotion change
+- Librosa is a good Python library that does MFCC, generates feature extraction functions
+  
+- Uncompressed and Lossless files like .wav, .flac, high resolution spectral domain analysis
+- Compressed containers, looking at compression forensics, MAC timestamps and container metadata
+- Im so sleepy right now, going to bed ಥ_ಥ
