@@ -1,5 +1,9 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+.venv/
+data/
+predictions/*
+!predictions/hearsay_predictions.tsv
 *.py[codz]
 *$py.class
 
