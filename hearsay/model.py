@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-import csv
 import hashlib
 import json
-import math
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -14,12 +12,11 @@ import joblib
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, average_precision_score, balanced_accuracy_score, roc_auc_score
-from sklearn.model_selection import GroupShuffleSplit, train_test_split
 
 from .features import FEATURE_NAMES, extract_features
+from .metadata import METADATA_REAL_WEIGHT, MetadataAnalysis, adjust_score, analyze_metadata
+from .utils import read_manifest, split_data
 
-LABELS = {"0": 0, "real": 0, "bonafide": 0, "bona fide": 0,
-          "1": 1, "synthetic": 1, "spoof": 1, "fake": 1}
 SPECTRAL_INDICES = tuple(i for i, name in enumerate(FEATURE_NAMES)
                          if not name.startswith(("mfcc_", "chroma_")))
 
@@ -36,53 +33,6 @@ class ForestEnsemble:
         for forest, indices, weight in self.components:
             result += weight * forest.predict_proba(matrix[:, indices])
         return result
-
-
-def read_manifest(path: Path) -> tuple[list[Path], np.ndarray, list[str] | None]:
-    """Read filename,label[,group] with paths relative to the manifest."""
-    with path.open("r", newline="", encoding="utf-8-sig") as stream:
-        reader = csv.DictReader(stream, delimiter="\t" if path.suffix.lower() == ".tsv" else ",")
-        if not reader.fieldnames or not {"filename", "label"}.issubset(reader.fieldnames):
-            raise ValueError("Manifest needs filename and label columns")
-        has_group = "group" in reader.fieldnames
-        files, labels, groups = [], [], []
-        for line, row in enumerate(reader, start=2):
-            filename = (row.get("filename") or "").strip()
-            label = (row.get("label") or "").strip().lower()
-            if not filename or label not in LABELS:
-                raise ValueError(f"Invalid filename or label on manifest line {line}")
-            audio_path = (path.parent / filename).resolve()
-            if not audio_path.is_file():
-                raise FileNotFoundError(f"Missing audio on manifest line {line}: {audio_path}")
-            files.append(audio_path)
-            labels.append(LABELS[label])
-            if has_group:
-                group = (row.get("group") or "").strip()
-                if not group:
-                    raise ValueError(f"Missing group on manifest line {line}")
-                groups.append(group)
-    if len(files) != len(set(files)):
-        raise ValueError("Manifest contains duplicate audio paths")
-    if len(set(labels)) != 2:
-        raise ValueError("Manifest must contain both real and synthetic examples")
-    return files, np.asarray(labels, dtype=np.int8), groups if has_group else None
-
-
-def _validation_indices(labels: np.ndarray, groups: list[str] | None, seed: int):
-    if len(labels) < 10 or np.bincount(labels, minlength=2).min() < 3:
-        return None
-    indices = np.arange(len(labels))
-    if groups is None:
-        n_test = max(2, math.ceil(len(labels) * 0.2))
-        return train_test_split(indices, test_size=n_test, stratify=labels, random_state=seed)
-    if len(set(groups)) < 4:
-        return None
-    for attempt in range(30):
-        train, test = next(GroupShuffleSplit(n_splits=1, test_size=0.25,
-                                            random_state=seed + attempt).split(indices, labels, groups))
-        if len(set(labels[train])) == 2 and len(set(labels[test])) == 2:
-            return train, test
-    return None
 
 
 def _new_forest(seed: int) -> RandomForestClassifier:
@@ -129,8 +79,24 @@ def feature_matrix(files: list[Path], cache: Path | None = None) -> np.ndarray:
     return matrix
 
 
-def train(manifest: Path, output: Path, seed: int = 42, cache: Path | None = None) -> dict:
+def train(manifest: Path, output: Path, seed: int = 42, cache: Path | None = None,
+          test_manifest: Path | None = None) -> dict:
     files, labels, groups = read_manifest(manifest)
+    provided_split = None
+    if test_manifest is not None:
+        test_files, test_labels, test_groups = read_manifest(test_manifest)
+        if set(files) & set(test_files):
+            raise ValueError("Training and test manifests contain overlapping audio files")
+        if (groups is None) != (test_groups is None):
+            raise ValueError("Training and test manifests must both include groups or both omit them")
+        if groups is not None and set(groups) & set(test_groups):
+            raise ValueError("Training and test manifests contain overlapping groups")
+        provided_split = (np.arange(len(files)), np.arange(len(files), len(files) + len(test_files)))
+        files += test_files
+        labels = np.concatenate((labels, test_labels))
+        if groups is not None:
+            groups += test_groups
+    metadata = [analyze_metadata(path) for path in files]
     features = feature_matrix(files, cache)
     report: dict = {
         "samples": len(files), "real": int(sum(labels == 0)),
@@ -138,13 +104,19 @@ def train(manifest: Path, output: Path, seed: int = 42, cache: Path | None = Non
         "feature_count": len(FEATURE_NAMES),
         "validation": None,
     }
-    split = _validation_indices(labels, groups, seed)
+    split = provided_split if provided_split is not None else split_data(labels, groups, seed=seed)
     if split is not None:
         train_idx, test_idx = split
-        candidate = _fit_ensemble(features[train_idx], labels[train_idx], seed)
-        probabilities = candidate.predict_proba(features[test_idx])[:, 1]
+        final = _fit_ensemble(features[train_idx], labels[train_idx], seed)
+        audio_scores = final.predict_proba(features[test_idx])[:, 1]
+        probabilities = np.asarray([
+            adjust_score(score, metadata[index])
+            for score, index in zip(audio_scores, test_idx)
+        ])
+        report["training_samples"] = len(train_idx)
         report["validation"] = {
-            "method": "group holdout" if groups is not None else "stratified clip holdout",
+            "method": ("provided test manifest" if provided_split is not None else
+                       "group holdout" if groups is not None else "stratified clip holdout"),
             "test_samples": len(test_idx),
             "test_real": int(sum(labels[test_idx] == 0)),
             "test_synthetic": int(sum(labels[test_idx] == 1)),
@@ -152,16 +124,21 @@ def train(manifest: Path, output: Path, seed: int = 42, cache: Path | None = Non
             "average_precision": round(float(average_precision_score(labels[test_idx], probabilities)), 4),
             "accuracy_at_0.5": round(float(accuracy_score(labels[test_idx], probabilities >= 0.5)), 4),
             "balanced_accuracy_at_0.5": round(float(balanced_accuracy_score(labels[test_idx], probabilities >= 0.5)), 4),
+            "metadata_real_weight": METADATA_REAL_WEIGHT,
+            "metadata_consistent": sum(metadata[index].status == "consistent" for index in test_idx),
+            "metadata_inconsistent": sum(metadata[index].status == "inconsistent" for index in test_idx),
         }
         if groups is not None:
             report["validation"]["test_groups"] = sorted({groups[i] for i in test_idx})
     else:
         report["validation_note"] = "Too few examples or groups for a valid two-class holdout; no accuracy estimate."
+        report["training_samples"] = len(files)
+        final = _fit_ensemble(features, labels, seed)
     report["caveat"] = (
         "A clip holdout can overestimate performance when speakers, generators, or recording "
-        "conditions overlap. Supply a group column to keep related clips together."
+        "conditions overlap. Supply a group column to keep related clips together. "
+        "Coherent container metadata is a forgeable, weak signal; its real-side weight is heuristic."
     )
-    final = _fit_ensemble(features, labels, seed)
     importance = np.zeros(len(FEATURE_NAMES), dtype=np.float64)
     for forest, indices, weight in final.components:
         importance[list(indices)] += weight * forest.feature_importances_
@@ -184,7 +161,8 @@ def load_model(path: Path) -> ForestEnsemble:
     return bundle["model"]
 
 
-def explain(model: ForestEnsemble, vector: np.ndarray) -> dict:
+def explain(model: ForestEnsemble, vector: np.ndarray,
+            metadata: MetadataAnalysis | None = None) -> dict:
     """Decompose the prediction into changes along each tree's decision path."""
     contributions = np.zeros(len(FEATURE_NAMES), dtype=np.float64)
     base = 0.0
@@ -207,10 +185,15 @@ def explain(model: ForestEnsemble, vector: np.ndarray) -> dict:
                 node = child
     # The root probability plus every path change equals the average leaf
     # probability. Avoid invoking another parallel forest prediction per clip.
-    score = float(np.clip(base + contributions.sum(), 0.0, 1.0))
+    audio_score = float(np.clip(base + contributions.sum(), 0.0, 1.0))
+    metadata = metadata or MetadataAnalysis("unknown")
+    score = adjust_score(audio_score, metadata)
     rank = np.argsort(-np.abs(contributions))[:8]
     return {
         "cm-score": score,
+        "audio_score": audio_score,
+        "metadata_adjustment": score - audio_score,
+        "metadata": metadata.as_dict(),
         "baseline_probability": float(base),
         "total_contribution": float(contributions.sum()),
         "feature_evidence": [
@@ -219,7 +202,7 @@ def explain(model: ForestEnsemble, vector: np.ndarray) -> dict:
              "direction": "synthetic" if contributions[i] > 0 else "real"}
             for i in rank if abs(contributions[i]) > 1e-8
         ],
-        "interpretation": "Contributions are shifts in this forest's probability, not proof of origin.",
+        "interpretation": "Audio contributions sum to audio_score; coherent metadata gives a small real-side adjustment, not proof of origin.",
     }
 
 

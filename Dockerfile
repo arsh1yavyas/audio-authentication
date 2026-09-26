@@ -4,7 +4,7 @@ WORKDIR /app
 COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 COPY hearsay /app/hearsay
-COPY models/hearsay.joblib /app/models/hearsay.joblib
+COPY models/hearsay-split.joblib /app/models/hearsay-split.joblib
 
 ENTRYPOINT ["python", "-m", "hearsay"]
-CMD ["predict", "--model", "/app/models/hearsay.joblib", "--input", "/data/test", "--output", "/predictions/hearsay_predictions.tsv"]
+CMD ["predict", "--model", "/app/models/hearsay-split.joblib", "--input", "/data/test", "--output", "/predictions/hearsay_predictions.tsv"]

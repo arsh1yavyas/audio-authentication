@@ -12,7 +12,8 @@ from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import GroupShuffleSplit
 
 from hearsay.features import FEATURE_NAMES
-from hearsay.model import feature_matrix, read_manifest
+from hearsay.model import feature_matrix
+from hearsay.utils import read_manifest
 
 
 def main() -> None:
