@@ -36,6 +36,17 @@ def write_wave(path: Path, frequency: float, noise: float, seed: int) -> None:
 
 
 class PipelineTest(unittest.TestCase):
+    def test_saved_optimized_model_score_explanation(self) -> None:
+        model_path = Path(__file__).resolve().parents[1] / "models" / "hearsay-optimized.joblib"
+        model = load_model(model_path)
+        vector = np.zeros(len(FEATURE_NAMES), dtype=np.float64)
+        result = explain(model, vector)
+        expected = float(model.predict_proba(vector.reshape(1, -1))[0, 1])
+        self.assertAlmostEqual(result["audio_score"], expected)
+        self.assertAlmostEqual(result["cm-score"], expected)
+        self.assertEqual(len(result["component_scores"]), 2)
+        self.assertEqual(result["feature_evidence"], [])
+
     def test_metadata_check_and_real_weight(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             folder = Path(temporary)

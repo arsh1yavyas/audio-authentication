@@ -22,6 +22,8 @@ def priority(name: str) -> int:
 
 
 def add_librispeech(archive: Path, data_dir: Path, per_speaker: int) -> list[tuple[str, str, str]]:
+    # Keep the lowest hash priorities for each speaker so archive order does
+    # not determine which clips enter the training manifest.
     heaps: dict[str, list[tuple[int, str]]] = {}
     with tarfile.open(archive, mode="r|gz") as tar:
         for member in tar:
@@ -77,6 +79,8 @@ def main() -> None:
 
     fake_root = args.data / "train" / "synthetic"
     candidates = {}
+    # Preparation retained extra candidates beyond its first manifest. Use
+    # those files to balance the added real speakers across generators.
     for generator_dir in fake_root.iterdir():
         if generator_dir.is_dir():
             files = [path for path in generator_dir.rglob("*")

@@ -83,6 +83,8 @@ def split_data(labels: np.ndarray, groups: list[str] | None = None, *,
     class_counts = np.bincount(labels, minlength=2)
     best = None
     best_score = float("inf")
+    # Random group splits can be badly class imbalanced even with balanced
+    # labels. Keep the valid split nearest the requested fraction per class.
     for attempt in range(100):
         train, test = next(GroupShuffleSplit(n_splits=1, test_size=n_test_groups,
                                             random_state=seed + attempt).split(indices, labels, groups))

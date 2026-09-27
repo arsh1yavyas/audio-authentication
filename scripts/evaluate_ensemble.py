@@ -1,4 +1,4 @@
-"""Compare weighted full-feature and spectral-feature random forests."""
+"""Compare forest weights on held-out generator families without saving a model."""
 
 from __future__ import annotations
 
@@ -36,6 +36,8 @@ def main() -> None:
         generators = [args.generator]
     by_weight: dict[str, dict[str, float]] = {str(w): {} for w in (0.0, 0.25, 0.5, 0.75, 1.0)}
     for seed in seeds:
+        # Hold out LibriSpeech speakers, LJ chapters, and each synthetic
+        # generator as groups. AUC does not depend on a classification cutoff.
         train_real, test_real = next(GroupShuffleSplit(n_splits=1, test_size=0.25,
                                                        random_state=seed).split(real, labels[real], groups[real]))
         train_real, test_real = real[train_real], real[test_real]

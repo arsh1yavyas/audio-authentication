@@ -49,6 +49,7 @@ def _wav_metadata(stream, file_size: int) -> MetadataAnalysis:
         stream.seek(position)
         chunk = stream.read(8)
         chunk_size = struct.unpack_from("<I", chunk, 4)[0]
+        # RIFF chunks occupy an even number of bytes; odd payloads have padding.
         next_position = position + 8 + chunk_size + (chunk_size % 2)
         if next_position > declared_end:
             return _inconsistent("A WAVE chunk extends past the declared RIFF size")
@@ -85,6 +86,7 @@ def _flac_metadata(header: bytes, file_size: int) -> MetadataAnalysis:
         return _inconsistent("FLAC STREAMINFO block is missing or malformed")
     if file_size < 42:
         return _inconsistent("FLAC file is shorter than its STREAMINFO block")
+    # STREAMINFO packs sample rate, channels, and bit depth into these 8 bytes.
     audio_info = int.from_bytes(header[18:26], "big")
     sample_rate = (audio_info >> 44) & 0xFFFFF
     channels = ((audio_info >> 41) & 0x7) + 1
@@ -143,6 +145,8 @@ def analyze_metadata(path: Path) -> MetadataAnalysis:
 
 def adjust_score(synthetic_score: float, analysis: MetadataAnalysis) -> float:
     """Give a small real-side weight only when checked metadata is coherent."""
+    # This is a transparent heuristic after audio classification, not a
+    # calibrated probability update or evidence that the speaker is real.
     if analysis.status == "consistent":
         return float(synthetic_score * (1 - METADATA_REAL_WEIGHT))
     return float(synthetic_score)

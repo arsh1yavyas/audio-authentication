@@ -23,7 +23,7 @@ MAX_AUDIO_SIZE = 30_000_000
 
 
 def nested_tar(zip_path: Path, expected_name: str):
-    """Return streaming context managers to avoid unpacking the whole TAR."""
+    """Open the ZIP after checking that it contains the expected TAR only."""
     outer = zipfile.ZipFile(zip_path)
     names = outer.namelist()
     if names != [expected_name]:
@@ -76,7 +76,9 @@ def prepare_real(archive: Path, output: Path) -> list[tuple[str, str, str]]:
 
 def prepare_synthetic(archive: Path, output: Path, target_count: int,
                       candidates_per_generator: int) -> tuple[list[tuple[str, str, str]], dict]:
-    # A max heap for each generator: the worst selected hash is at index zero.
+    # A max heap retains the lowest hash priorities per generator while the TAR
+    # is streamed once. Candidate files stay on disk for later rebalancing;
+    # only the rows selected below are written to this manifest.
     heaps: dict[str, list[tuple[int, str]]] = {}
     counts: Counter[str] = Counter()
     ignored = 0
