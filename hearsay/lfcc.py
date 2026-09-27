@@ -12,7 +12,7 @@ import librosa
 import numpy as np
 from scipy.fft import dct
 
-from .features import EPSILON, SAMPLE_RATE, decode_audio
+from .features import EPSILON, SAMPLE_RATE, decode_audio, validate_audio
 
 N_FFT = 1024
 HOP_LENGTH = 256
@@ -37,8 +37,8 @@ def _linear_filterbank() -> np.ndarray:
         bank[index] = np.maximum(
             0.0, np.minimum((frequencies - left) / max(center - left, EPSILON),
                             (right - frequencies) / max(right - center, EPSILON)))
-    # Equalize each filter's integrated response so wide high-frequency bins
-    # do not receive more weight solely because of discretization.
+    # Normalize discrete filter weights so bin alignment does not change
+    # one filter's response relative to another.
     bank /= np.maximum(bank.sum(axis=1, keepdims=True), EPSILON)
     return bank
 
@@ -48,12 +48,8 @@ _FILTERBANK = _linear_filterbank()
 
 def extract_lfcc_features(path: Path, audio: np.ndarray | None = None) -> np.ndarray:
     """Return mean/std of static LFCCs and first/second temporal deltas."""
-    signal = decode_audio(path) if audio is None else np.asarray(audio, dtype=np.float64)
-    if signal.ndim != 1 or signal.size < SAMPLE_RATE // 2:
-        raise ValueError(f"Audio is too short or not mono: {path}")
+    signal = decode_audio(path) if audio is None else validate_audio(audio, path)
     peak = float(np.max(np.abs(signal)))
-    if not np.isfinite(peak) or peak < 1e-6 or not np.all(np.isfinite(signal)):
-        raise ValueError(f"Audio is silent or invalid: {path}")
     signal = (signal / peak).astype(np.float32)
     magnitude = np.abs(librosa.stft(signal, n_fft=N_FFT, hop_length=HOP_LENGTH))
     log_energy = np.log(np.maximum(_FILTERBANK @ (magnitude.astype(np.float64) ** 2), EPSILON))

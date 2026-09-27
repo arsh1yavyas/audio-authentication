@@ -52,28 +52,73 @@ class CentroidClusterer:
         return np.argmin(distances, axis=1)
 
 
-def min_dcf(labels: np.ndarray, scores: np.ndarray, p_spoof: float = 0.3,
-            c_miss: float = 1.0, c_fa: float = 4.0) -> tuple[float, float]:
-    """Official ASVspoof-style normalized minDCF for scores increasing as spoof."""
-    y = np.asarray(labels, dtype=np.int8).reshape(-1)
+def _dcf_inputs(labels: np.ndarray, scores: np.ndarray, p_spoof: float,
+                c_miss: float, c_fa: float) -> tuple[np.ndarray, np.ndarray, float]:
+    """Validate the shared score convention and return the DCF normalizer."""
+    y = np.asarray(labels).reshape(-1)
     s = np.asarray(scores, dtype=float).reshape(-1)
     if len(y) != len(s) or len(y) == 0 or set(np.unique(y)) != {0, 1}:
         raise ValueError("minDCF needs equally sized scores and both labels (0=real, 1=spoof)")
     if not np.all(np.isfinite(s)) or not 0 < p_spoof < 1:
         raise ValueError("Scores must be finite and Pspoof must be between zero and one")
-    thresholds = np.r_[-np.inf, np.unique(s), np.inf]
-    real = y == 0
-    spoof = y == 1
-    costs = []
-    for threshold in thresholds:
-        predicted_spoof = s >= threshold
-        p_miss = float(np.mean(~predicted_spoof[spoof]))
-        p_fa = float(np.mean(predicted_spoof[real]))
-        raw = c_miss * p_miss * (1 - p_spoof) + c_fa * p_fa * p_spoof
-        normalizer = min(c_miss * (1 - p_spoof), c_fa * p_spoof)
-        costs.append(raw / normalizer)
+    if not np.isfinite(c_miss) or not np.isfinite(c_fa) or c_miss <= 0 or c_fa <= 0:
+        raise ValueError("Miss and false-alarm costs must be finite and positive")
+    return y, s, min(c_miss * p_spoof, c_fa * (1.0 - p_spoof))
+
+
+def dcf_at_cutoff(labels: np.ndarray, scores: np.ndarray, cutoff: float,
+                  p_spoof: float = 0.3, c_miss: float = 1.0,
+                  c_fa: float = 4.0) -> float:
+    """Normalized DCF for declaring scores at or above ``cutoff`` spoof.
+
+    This is the deployable cost when the cutoff was chosen without looking at
+    these labels. A miss accepts spoof as real; a false alarm rejects real.
+    Positive or negative infinite cutoffs represent the two constant decisions.
+    """
+    y, s, normalizer = _dcf_inputs(labels, scores, p_spoof, c_miss, c_fa)
+    if np.asarray(cutoff).ndim != 0:
+        raise ValueError("Cutoff must be a scalar number other than NaN")
+    try:
+        threshold = float(cutoff)
+    except (TypeError, ValueError) as error:
+        raise ValueError("Cutoff must be a scalar number other than NaN") from error
+    if np.isnan(threshold):
+        raise ValueError("Cutoff must be a scalar number other than NaN")
+    miss_rate = np.mean(s[y == 1] < threshold)
+    false_alarm_rate = np.mean(s[y == 0] >= threshold)
+    return float((c_miss * p_spoof * miss_rate +
+                  c_fa * (1.0 - p_spoof) * false_alarm_rate) / normalizer)
+
+
+def min_dcf(labels: np.ndarray, scores: np.ndarray, p_spoof: float = 0.3,
+            c_miss: float = 1.0, c_fa: float = 4.0) -> tuple[float, float]:
+    """Minimize normalized DCF for scores increasing as spoof.
+
+    A miss accepts spoof as real; a false alarm flags real as spoof. For the
+    default 30% spoof prior and 4:1 false-alarm cost, the numerator is
+    ``0.3 * FNR + 2.8 * FPR`` and the normalizer is ``0.3``. The result is
+    an optimistic ranking summary; select a deployment cutoff on separate data.
+    """
+    y, s, normalizer = _dcf_inputs(labels, scores, p_spoof, c_miss, c_fa)
+
+    # For score >= threshold, every tied score must receive the same decision.
+    # Evaluate each distinct score and one cutoff above the maximum (all real).
+    order = np.argsort(s, kind="stable")
+    sorted_scores = s[order]
+    sorted_labels = y[order]
+    distinct_scores, first_indices = np.unique(sorted_scores, return_index=True)
+    thresholds = np.r_[distinct_scores, np.nextafter(distinct_scores[-1], np.inf)]
+    positions = np.r_[first_indices, len(s)]
+    real_below = np.r_[0, np.cumsum(sorted_labels == 0)][positions]
+    spoof_below = np.r_[0, np.cumsum(sorted_labels == 1)][positions]
+    n_real = int(np.sum(y == 0))
+    n_spoof = len(y) - n_real
+    p_miss = spoof_below / n_spoof
+    p_fa = (n_real - real_below) / n_real
+    costs = (c_miss * p_spoof * p_miss +
+             c_fa * (1.0 - p_spoof) * p_fa)
     index = int(np.argmin(costs))
-    return float(costs[index]), float(thresholds[index])
+    return float(costs[index] / normalizer), float(thresholds[index])
 
 
 def _select_alpha(labels: np.ndarray, arshiya: np.ndarray, julia: np.ndarray) -> tuple[float, float]:

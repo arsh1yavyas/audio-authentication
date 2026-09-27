@@ -19,7 +19,7 @@ from sklearn.model_selection import GroupKFold
 from hearsay.features import FEATURE_NAMES
 from hearsay.metadata import adjust_score, analyze_metadata
 from hearsay.model import _fit_ensemble, feature_matrix, fit_optimized, load_model, save_json
-from hearsay.routing import min_dcf
+from hearsay.routing import dcf_at_cutoff, min_dcf
 from hearsay.utils import read_manifest
 
 
@@ -28,11 +28,7 @@ def summarize(labels: np.ndarray, scores: np.ndarray) -> dict:
     if len(set(labels)) != 2:
         raise ValueError("Evaluation needs both real and synthetic clips")
     matrix = confusion_matrix(labels, scores >= 0.5, labels=[0, 1])
-    # Labels are 0=real, 1=synthetic and larger scores mean more synthetic.
-    # The challenge uses Pspoof=.3, Cmiss=1, Cfa=4 and normalizes by .7.
-    fixed_miss = matrix[1, 0] / matrix[1].sum()
-    fixed_false_alarm = matrix[0, 1] / matrix[0].sum()
-    fixed_dcf = (0.7 * fixed_miss + 1.2 * fixed_false_alarm) / 0.7
+    fixed_dcf = dcf_at_cutoff(labels, scores, 0.5)
     challenge_min_dcf, min_dcf_threshold = min_dcf(labels, scores)
     return {
         "samples": len(labels),
@@ -144,7 +140,7 @@ def main() -> None:
                 for status in ("consistent", "inconsistent", "unknown")
             },
         },
-        "min_dcf_definition": "Hearsay: (0.7 * miss + 1.2 * false_alarm) / 0.7, minimized over score thresholds (Pspoof=0.3, Cmiss=1, Cfa=4)",
+        "min_dcf_definition": "Hearsay: (0.3 * miss + 2.8 * false_alarm) / 0.3, minimized over score thresholds (Pspoof=0.3, Cmiss=1, Cfa=4)",
         "caveat": "The test set holds out only PlayHT and Pro Diff generator families. All training metadata is consistent, while all held-out PlayHT containers are inconsistent. Shared synthetic speaker IDs and the LJ narrator limit generalization claims.",
     }
     args.model.parent.mkdir(parents=True, exist_ok=True)

@@ -50,12 +50,17 @@ def decode_audio(path: Path) -> np.ndarray:
     if result.returncode != 0:
         message = result.stderr.decode("utf-8", errors="replace").strip()
         raise ValueError(f"Cannot decode {path}: {message}")
-    audio = np.frombuffer(result.stdout, dtype="<f4").astype(np.float64)
-    if audio.size < SAMPLE_RATE // 2:
-        raise ValueError(f"Audio is shorter than 0.5 seconds: {path}")
-    if not np.all(np.isfinite(audio)) or np.max(np.abs(audio)) < 1e-6:
+    return validate_audio(np.frombuffer(result.stdout, dtype="<f4"), path)
+
+
+def validate_audio(audio: np.ndarray, path: Path) -> np.ndarray:
+    """Apply the same mono, duration, and signal checks to decoded or supplied audio."""
+    signal = np.asarray(audio, dtype=np.float64)
+    if signal.ndim != 1 or signal.size < SAMPLE_RATE // 2:
+        raise ValueError(f"Audio is shorter than 0.5 seconds or not mono: {path}")
+    if not np.all(np.isfinite(signal)) or np.max(np.abs(signal)) < 1e-6:
         raise ValueError(f"Audio is silent or invalid: {path}")
-    return audio
+    return signal
 
 
 def lowpass_audio(audio: np.ndarray, cutoff_hz: float) -> np.ndarray:
@@ -80,7 +85,7 @@ def extract_features(path: Path, audio: np.ndarray | None = None) -> np.ndarray:
     The STFT is represented by spectral flux and three relative frequency bands.
     Mean and standard deviation retain some time variation in a fixed-size vector.
     """
-    audio = decode_audio(path) if audio is None else audio
+    audio = decode_audio(path) if audio is None else validate_audio(audio, path)
     # Peak normalization removes arbitrary recording gain while preserving dynamics.
     audio = audio / np.max(np.abs(audio))
     signal = audio.astype(np.float32)

@@ -3,11 +3,15 @@
 from __future__ import annotations
 
 import argparse
+import re
 import shutil
 import tarfile
 import zipfile
 from contextlib import contextmanager
 from pathlib import Path, PurePosixPath
+
+SAFE_WAV_NAME = re.compile(r"HGT[A-Za-z0-9_.-]*\.wav\Z")
+MAX_AUDIO_SIZE = 30_000_000
 
 
 @contextmanager
@@ -34,6 +38,7 @@ def main() -> None:
     args.output.mkdir(parents=True, exist_ok=True)
     wav_count = 0
     template_count = 0
+    seen_wavs: set[str] = set()
     with archive_tar(args.archive) as inner:
         for member in inner:
             if not member.isfile():
@@ -42,7 +47,12 @@ def main() -> None:
             if len(source.parts) != 2 or source.parts[0] != "HackGTHearsayTesting":
                 raise ValueError(f"Unexpected TAR path: {member.name}")
             name = source.name
-            if name.endswith(".wav") and name.startswith("HGT"):
+            if SAFE_WAV_NAME.fullmatch(name):
+                if name in seen_wavs:
+                    raise ValueError(f"Duplicate test WAV in archive: {name}")
+                if member.size > MAX_AUDIO_SIZE:
+                    raise ValueError(f"Unusually large test WAV: {name}")
+                seen_wavs.add(name)
                 destination = args.output / "test" / name
                 wav_count += 1
             elif name == "HGT_Hearsay_score_template.csv":
@@ -57,6 +67,10 @@ def main() -> None:
             if destination.exists():
                 if destination.stat().st_size != member.size:
                     raise ValueError(f"Existing file has different size: {destination}")
+                with destination.open("rb") as existing:
+                    while chunk := existing.read(1024 * 1024):
+                        if chunk != extracted.read(len(chunk)):
+                            raise ValueError(f"Existing file differs from archive: {destination}")
                 continue
             with destination.open("xb") as target:
                 shutil.copyfileobj(extracted, target)

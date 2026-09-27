@@ -1,0 +1,160 @@
+{
+  "objective": "(4 * 0.7 * real_false_positive_rate + 1 * 0.3 * spoof_false_negative_rate) / 0.3",
+  "training_samples": 1167,
+  "test_samples": 293,
+  "train_manifest_sha256": "c77d1cd5b49304fa02164cf6c355afcd2dd4683d22c3750a415345ab0282f87a",
+  "test_manifest_sha256": "4a846c2626afd58d7ac8fde5b73f1decaffc2e70802322ac5554c37fea619b5d",
+  "baseline_cache_verification": {
+    "method": "existing cache, five decoded rows checked",
+    "checked_row_indices": [
+      0,
+      364,
+      729,
+      1094,
+      1459
+    ]
+  },
+  "validation": "Three generator-held-out partitions with disjoint real groups; selection uses training only",
+  "oof_scores": "models\\lfcc_mindcf_oof.npz",
+  "partitions": [
+    {
+      "partition": 0,
+      "results": {
+        "optimized_84": {
+          "normalized_min_dcf": 0.5801279791975061,
+          "min_dcf_cutoff": 0.827117308124141,
+          "roc_auc": 0.9109794638031907
+        },
+        "optimized_204": {
+          "normalized_min_dcf": 0.30487675932235253,
+          "min_dcf_cutoff": 0.6981323433567795,
+          "roc_auc": 0.9088206959749994
+        },
+        "svm_204": {
+          "normalized_min_dcf": 0.33569867713057167,
+          "min_dcf_cutoff": 0.8019897998350289,
+          "roc_auc": 0.8963497732559506
+        },
+        "cost_weighted_svm_204": {
+          "normalized_min_dcf": 0.337411005897695,
+          "min_dcf_cutoff": 0.8535207437495661,
+          "roc_auc": 0.8964936911111633
+        }
+      }
+    },
+    {
+      "partition": 1,
+      "results": {
+        "optimized_84": {
+          "normalized_min_dcf": 0.42824666932963645,
+          "min_dcf_cutoff": 0.7423424017969918,
+          "roc_auc": 0.9299736835921897
+        },
+        "optimized_204": {
+          "normalized_min_dcf": 0.3243105649412189,
+          "min_dcf_cutoff": 0.756582428096761,
+          "roc_auc": 0.9106123264174439
+        },
+        "svm_204": {
+          "normalized_min_dcf": 0.35795895110317444,
+          "min_dcf_cutoff": 0.8615796566073065,
+          "roc_auc": 0.8960986512840996
+        },
+        "cost_weighted_svm_204": {
+          "normalized_min_dcf": 0.35222377562129437,
+          "min_dcf_cutoff": 0.9013676084043692,
+          "roc_auc": 0.8961852957071361
+        }
+      }
+    },
+    {
+      "partition": 2,
+      "results": {
+        "optimized_84": {
+          "normalized_min_dcf": 0.4791005819372322,
+          "min_dcf_cutoff": 0.7538571935625913,
+          "roc_auc": 0.9260174111233818
+        },
+        "optimized_204": {
+          "normalized_min_dcf": 0.3220000469935854,
+          "min_dcf_cutoff": 0.7861860748973435,
+          "roc_auc": 0.920149087149604
+        },
+        "svm_204": {
+          "normalized_min_dcf": 0.30085391260759575,
+          "min_dcf_cutoff": 0.8126284168709025,
+          "roc_auc": 0.9062683568692873
+        },
+        "cost_weighted_svm_204": {
+          "normalized_min_dcf": 0.31343840315796895,
+          "min_dcf_cutoff": 0.837074855253066,
+          "roc_auc": 0.9049642848751145
+        }
+      }
+    }
+  ],
+  "mean_training_min_dcf": {
+    "optimized_84": 0.49582507682145827,
+    "optimized_204": 0.31706245708571895,
+    "svm_204": 0.33150384694711393,
+    "cost_weighted_svm_204": 0.33435772822565274
+  },
+  "training_cutoffs": {
+    "optimized_84": 0.7538571935625913,
+    "optimized_204": 0.756582428096761,
+    "svm_204": 0.8126284168709025,
+    "cost_weighted_svm_204": 0.8535207437495661
+  },
+  "selected_model": "optimized_204",
+  "selected_training_cutoff": 0.756582428096761,
+  "held_out_test": {
+    "status": "exploratory; this split was examined in earlier work",
+    "results": {
+      "optimized_84": {
+        "normalized_min_dcf": 0.13013698630136986,
+        "min_dcf_cutoff": 0.6881226740267499,
+        "roc_auc": 0.9930109029913335,
+        "audio_only": {
+          "normalized_min_dcf": 0.1506849315068493,
+          "min_dcf_cutoff": 0.7300996243159199,
+          "roc_auc": 0.992498369210698
+        },
+        "cost_at_training_cutoff": 0.21232876712328763
+      },
+      "optimized_204": {
+        "normalized_min_dcf": 0.07534246575342465,
+        "min_dcf_cutoff": 0.8082703439882447,
+        "roc_auc": 0.9974373310968223,
+        "audio_only": {
+          "normalized_min_dcf": 0.08904109589041095,
+          "min_dcf_cutoff": 0.8284924919305323,
+          "roc_auc": 0.9971111732364178
+        },
+        "cost_at_training_cutoff": 0.13198521417699502
+      },
+      "svm_204": {
+        "normalized_min_dcf": 0.0958904109589041,
+        "min_dcf_cutoff": 0.8829654845791497,
+        "roc_auc": 0.9957599478147423,
+        "audio_only": {
+          "normalized_min_dcf": 0.12328767123287669,
+          "min_dcf_cutoff": 0.9232490456714667,
+          "roc_auc": 0.9950610381138756
+        },
+        "cost_at_training_cutoff": 0.18862796260056533
+      },
+      "cost_weighted_svm_204": {
+        "normalized_min_dcf": 0.11643835616438356,
+        "min_dcf_cutoff": 0.911668448645893,
+        "roc_auc": 0.9945019103531825,
+        "audio_only": {
+          "normalized_min_dcf": 0.15753424657534246,
+          "min_dcf_cutoff": 0.9644254046498552,
+          "roc_auc": 0.9939427825924891
+        },
+        "cost_at_training_cutoff": 0.2091759078060448
+      }
+    }
+  },
+  "caveat": "LJ chapters share a narrator; synthetic groups come from DiffSSD; no hidden challenge labels used."
+}

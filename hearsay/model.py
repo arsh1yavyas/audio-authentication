@@ -67,6 +67,20 @@ def fit_optimized(features: np.ndarray, labels: np.ndarray, seed: int = 42) -> O
     return OptimizedEnsemble([("rbf_svm", svm, 0.75), ("logistic", logistic, 0.25)])
 
 
+def fit_mindcf(features: np.ndarray, labels: np.ndarray, seed: int = 42) -> OptimizedEnsemble:
+    """Fit the single RBF SVM evaluated by ``scripts.train_mindcf``.
+
+    The challenge prior and error costs determine model selection and the
+    operating threshold; they do not calibrate these SVM probabilities.
+    """
+    svm = make_pipeline(StandardScaler(), SVC(
+        C=1.0, gamma="scale", class_weight="balanced", probability=True,
+        random_state=seed,
+    ))
+    svm.fit(features, labels)
+    return OptimizedEnsemble([("rbf_svm", svm, 1.0)])
+
+
 def _new_forest(seed: int) -> RandomForestClassifier:
     return RandomForestClassifier(
         n_estimators=300, min_samples_leaf=2, max_features="sqrt",
