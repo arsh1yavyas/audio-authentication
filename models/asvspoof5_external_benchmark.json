@@ -1,0 +1,743 @@
+{
+  "objective": "Hearsay normalized minDCF (Pspoof=0.3, Cmiss=1, Cfa=4); lower is better",
+  "score_direction": "higher means synthetic/spoof",
+  "train": {
+    "hearsay_count": 1460,
+    "official_asvspoof5_count": 9801,
+    "selected_asvspoof5_counts": {
+      "spoof": 6000,
+      "real": 3801
+    },
+    "total_count": 11261,
+    "real": 4531,
+    "synthetic": 6730,
+    "complete_source_groups": 492,
+    "asvspoof_attack_families": [
+      "A01",
+      "A02",
+      "A03",
+      "A04",
+      "A05",
+      "A06",
+      "A07",
+      "A08"
+    ],
+    "grouped_oof_models": {
+      "logistic_204": {
+        "normalized_minDCF": 0.24882250271067538,
+        "minDCF_threshold": 0.9412925243377686,
+        "FAR_at_minDCF": 0.005517545795630104,
+        "miss_rate_at_minDCF": 0.19732540861812778,
+        "EER": 0.09865821156746507,
+        "AUC": 0.9634658779554943
+      },
+      "rbf_svm_204": {
+        "normalized_minDCF": 0.22649353323956511,
+        "minDCF_threshold": 0.8221282405295317,
+        "FAR_at_minDCF": 0.005958949459280512,
+        "miss_rate_at_minDCF": 0.17087667161961367,
+        "EER": 0.07747868981160981,
+        "AUC": 0.9783632843974299
+      },
+      "rbf_svm_c0_3_204": {
+        "normalized_minDCF": 0.2422907232319231,
+        "minDCF_threshold": 0.8335737093637894,
+        "FAR_at_minDCF": 0.007062458618406533,
+        "miss_rate_at_minDCF": 0.17637444279346212,
+        "EER": 0.08117377301423283,
+        "AUC": 0.9770999385773358
+      },
+      "rbf_svm_c3_204": {
+        "normalized_minDCF": 0.21900305080110175,
+        "minDCF_threshold": 0.7419149748556135,
+        "FAR_at_minDCF": 0.006621054954756124,
+        "miss_rate_at_minDCF": 0.15720653789004457,
+        "EER": 0.07736615811236638,
+        "AUC": 0.9789425201263346
+      },
+      "cost_logistic_204": {
+        "normalized_minDCF": 0.23809767263960807,
+        "minDCF_threshold": 0.8789721727371216,
+        "FAR_at_minDCF": 0.004193334804678879,
+        "miss_rate_at_minDCF": 0.1989598811292719,
+        "EER": 0.09769674846845061,
+        "AUC": 0.9631769815531965
+      },
+      "cost_rbf_svm_204": {
+        "normalized_minDCF": 0.2192330551222228,
+        "minDCF_threshold": 0.7707206386926388,
+        "FAR_at_minDCF": 0.0057382476274553075,
+        "miss_rate_at_minDCF": 0.16567607726597325,
+        "EER": 0.07939943522630795,
+        "AUC": 0.9776587766035071
+      },
+      "cost_rbf_svm_c0_3_204": {
+        "normalized_minDCF": 0.22379858787993864,
+        "minDCF_threshold": 0.7536635771153094,
+        "FAR_at_minDCF": 0.006179651291105716,
+        "miss_rate_at_minDCF": 0.16612184249628528,
+        "EER": 0.0775147465224704,
+        "AUC": 0.9776688770736708
+      },
+      "cost_rbf_svm_c3_204": {
+        "normalized_minDCF": 0.21902340477885598,
+        "minDCF_threshold": 0.7426045614394321,
+        "FAR_at_minDCF": 0.00640035312293092,
+        "miss_rate_at_minDCF": 0.15928677563150073,
+        "EER": 0.07736615811236638,
+        "AUC": 0.9784900649742257
+      },
+      "logistic_temporal": {
+        "normalized_minDCF": 0.7950823827796165,
+        "minDCF_threshold": 0.8864428997039795,
+        "FAR_at_minDCF": 0.017876848377841537,
+        "miss_rate_at_minDCF": 0.6282317979197622,
+        "EER": 0.21472656748311042,
+        "AUC": 0.8581175642257088
+      },
+      "extra_trees_base": {
+        "normalized_minDCF": 0.37233002433623025,
+        "minDCF_threshold": 0.7215410865470242,
+        "FAR_at_minDCF": 0.013242109909512249,
+        "miss_rate_at_minDCF": 0.2487369985141159,
+        "EER": 0.09821462712048384,
+        "AUC": 0.9612588104466407
+      }
+    },
+    "grouped_oof_by_corpus": {
+      "hearsay_sources": {
+        "count": 1460,
+        "models": {
+          "logistic_204": {
+            "normalized_minDCF": 0.497716894977169,
+            "minDCF_threshold": 0.9402954578399658,
+            "FAR_at_minDCF": 0.005479452054794521,
+            "miss_rate_at_minDCF": 0.4465753424657534,
+            "EER": 0.21575342465753422,
+            "AUC": 0.8615462563332708
+          },
+          "rbf_svm_204": {
+            "normalized_minDCF": 0.5219178082191781,
+            "minDCF_threshold": 0.6885534531608962,
+            "FAR_at_minDCF": 0.00410958904109589,
+            "miss_rate_at_minDCF": 0.48356164383561645,
+            "EER": 0.2191780821917808,
+            "AUC": 0.8682454494276599
+          },
+          "rbf_svm_c0_3_204": {
+            "normalized_minDCF": 0.547945205479452,
+            "minDCF_threshold": 0.6505338057088561,
+            "FAR_at_minDCF": 0.00410958904109589,
+            "miss_rate_at_minDCF": 0.5095890410958904,
+            "EER": 0.24520547945205481,
+            "AUC": 0.8439969975605179
+          },
+          "rbf_svm_c3_204": {
+            "normalized_minDCF": 0.5223744292237443,
+            "minDCF_threshold": 0.6815445249846069,
+            "FAR_at_minDCF": 0.005479452054794521,
+            "miss_rate_at_minDCF": 0.4712328767123288,
+            "EER": 0.22328767123287668,
+            "AUC": 0.8735597673109401
+          },
+          "cost_logistic_204": {
+            "normalized_minDCF": 0.4954337899543379,
+            "minDCF_threshold": 0.8740158081054688,
+            "FAR_at_minDCF": 0.0027397260273972603,
+            "miss_rate_at_minDCF": 0.46986301369863015,
+            "EER": 0.2321917808219178,
+            "AUC": 0.849072996809908
+          },
+          "cost_rbf_svm_204": {
+            "normalized_minDCF": 0.5383561643835616,
+            "minDCF_threshold": 0.7861409564149472,
+            "FAR_at_minDCF": 0.0,
+            "miss_rate_at_minDCF": 0.5383561643835616,
+            "EER": 0.2205479452054795,
+            "AUC": 0.8673428410583599
+          },
+          "cost_rbf_svm_c0_3_204": {
+            "normalized_minDCF": 0.554337899543379,
+            "minDCF_threshold": 0.6231697620547413,
+            "FAR_at_minDCF": 0.00684931506849315,
+            "miss_rate_at_minDCF": 0.4904109589041096,
+            "EER": 0.2308219178082192,
+            "AUC": 0.8631169074873335
+          },
+          "cost_rbf_svm_c3_204": {
+            "normalized_minDCF": 0.534703196347032,
+            "minDCF_threshold": 0.6838548074529158,
+            "FAR_at_minDCF": 0.005479452054794521,
+            "miss_rate_at_minDCF": 0.48356164383561645,
+            "EER": 0.2246575342465753,
+            "AUC": 0.8715500093826234
+          },
+          "logistic_temporal": {
+            "normalized_minDCF": 0.8643835616438356,
+            "minDCF_threshold": 0.868206262588501,
+            "FAR_at_minDCF": 0.00410958904109589,
+            "miss_rate_at_minDCF": 0.826027397260274,
+            "EER": 0.410958904109589,
+            "AUC": 0.6544192156126853
+          },
+          "extra_trees_base": {
+            "normalized_minDCF": 0.717351598173516,
+            "minDCF_threshold": 0.6470462718987943,
+            "FAR_at_minDCF": 0.0027397260273972603,
+            "miss_rate_at_minDCF": 0.6917808219178082,
+            "EER": 0.30000000000000004,
+            "AUC": 0.7823606680427848
+          },
+          "global_blend": {
+            "normalized_minDCF": 0.5652968036529681,
+            "minDCF_threshold": 0.6828445355145585,
+            "FAR_at_minDCF": 0.00684931506849315,
+            "miss_rate_at_minDCF": 0.5013698630136987,
+            "EER": 0.22465753424657534,
+            "AUC": 0.8709382623381499
+          },
+          "conditional_kmeans": {
+            "normalized_minDCF": 0.5730593607305936,
+            "minDCF_threshold": 0.7891571068001549,
+            "FAR_at_minDCF": 0.0013698630136986301,
+            "miss_rate_at_minDCF": 0.5602739726027397,
+            "EER": 0.20684931506849313,
+            "AUC": 0.8761493713642334
+          }
+        }
+      },
+      "asvspoof5_training_families": {
+        "count": 9801,
+        "models": {
+          "logistic_204": {
+            "normalized_minDCF": 0.21839871086556167,
+            "minDCF_threshold": 0.9416227340698242,
+            "FAR_at_minDCF": 0.0055248618784530384,
+            "miss_rate_at_minDCF": 0.16683333333333333,
+            "EER": 0.08229183109707972,
+            "AUC": 0.9738706919231779
+          },
+          "rbf_svm_204": {
+            "normalized_minDCF": 0.185987722529159,
+            "minDCF_threshold": 0.8825861715648526,
+            "FAR_at_minDCF": 0.004998684556695606,
+            "miss_rate_at_minDCF": 0.13933333333333334,
+            "EER": 0.05704511970534072,
+            "AUC": 0.9869350609488732
+          },
+          "rbf_svm_c0_3_204": {
+            "normalized_minDCF": 0.20258717004297114,
+            "minDCF_threshold": 0.8637396925969231,
+            "FAR_at_minDCF": 0.007366482504604052,
+            "miss_rate_at_minDCF": 0.13383333333333333,
+            "EER": 0.05575585372270458,
+            "AUC": 0.9871968780145577
+          },
+          "rbf_svm_c3_204": {
+            "normalized_minDCF": 0.18309852670349908,
+            "minDCF_threshold": 0.8192785876464311,
+            "FAR_at_minDCF": 0.006314127861089187,
+            "miss_rate_at_minDCF": 0.12416666666666666,
+            "EER": 0.05623382004735597,
+            "AUC": 0.9870257826887661
+          },
+          "cost_logistic_204": {
+            "normalized_minDCF": 0.20406537753222836,
+            "minDCF_threshold": 0.8043379187583923,
+            "FAR_at_minDCF": 0.0055248618784530384,
+            "miss_rate_at_minDCF": 0.1525,
+            "EER": 0.08012102078400418,
+            "AUC": 0.9748237963693765
+          },
+          "cost_rbf_svm_204": {
+            "normalized_minDCF": 0.18038735420503374,
+            "minDCF_threshold": 0.750203044054757,
+            "FAR_at_minDCF": 0.006577216521967903,
+            "miss_rate_at_minDCF": 0.119,
+            "EER": 0.05815463036043148,
+            "AUC": 0.9861030869069543
+          },
+          "cost_rbf_svm_c0_3_204": {
+            "normalized_minDCF": 0.18398772252915901,
+            "minDCF_threshold": 0.865703351478239,
+            "FAR_at_minDCF": 0.004998684556695606,
+            "miss_rate_at_minDCF": 0.13733333333333334,
+            "EER": 0.05550585372270455,
+            "AUC": 0.9862542313426291
+          },
+          "cost_rbf_svm_c3_204": {
+            "normalized_minDCF": 0.1803428483732351,
+            "minDCF_threshold": 0.7426045614394321,
+            "FAR_at_minDCF": 0.0068403051828466194,
+            "miss_rate_at_minDCF": 0.1165,
+            "EER": 0.05666357537490134,
+            "AUC": 0.9866243093922653
+          },
+          "logistic_temporal": {
+            "normalized_minDCF": 0.794195211786372,
+            "minDCF_threshold": 0.8864428997039795,
+            "FAR_at_minDCF": 0.020520915548539857,
+            "miss_rate_at_minDCF": 0.6026666666666667,
+            "EER": 0.1873262299394896,
+            "AUC": 0.8834168859072173
+          },
+          "extra_trees_base": {
+            "normalized_minDCF": 0.33199631675874774,
+            "minDCF_threshold": 0.7215410865470242,
+            "FAR_at_minDCF": 0.01578531965272297,
+            "miss_rate_at_minDCF": 0.18466666666666667,
+            "EER": 0.0715300578795054,
+            "AUC": 0.9802622336227309
+          },
+          "global_blend": {
+            "normalized_minDCF": 0.19883241252302025,
+            "minDCF_threshold": 0.9170563878426746,
+            "FAR_at_minDCF": 0.003946329913180742,
+            "miss_rate_at_minDCF": 0.162,
+            "EER": 0.06879794790844514,
+            "AUC": 0.9810788827501535
+          },
+          "conditional_kmeans": {
+            "normalized_minDCF": 0.19129926335174954,
+            "minDCF_threshold": 0.9154457214289292,
+            "FAR_at_minDCF": 0.0031570639305445935,
+            "miss_rate_at_minDCF": 0.16183333333333333,
+            "EER": 0.06866640357800578,
+            "AUC": 0.9812544505831798
+          }
+        }
+      }
+    },
+    "cross_fitted_routing": {
+      "folds": [
+        {
+          "fold": 1,
+          "model_pair": [
+            "cost_rbf_svm_c3_204",
+            "cost_rbf_svm_204"
+          ],
+          "global_alpha": 0.9,
+          "conditional_cluster_weights": {
+            "0": 0.4,
+            "1": 0.0,
+            "2": 0.9
+          }
+        },
+        {
+          "fold": 2,
+          "model_pair": [
+            "rbf_svm_c3_204",
+            "cost_rbf_svm_c3_204"
+          ],
+          "global_alpha": 0.15000000000000002,
+          "conditional_cluster_weights": {
+            "0": 0.35000000000000003,
+            "1": 0.9,
+            "2": 0.15000000000000002
+          }
+        },
+        {
+          "fold": 3,
+          "model_pair": [
+            "cost_logistic_204",
+            "cost_rbf_svm_204"
+          ],
+          "global_alpha": 0.5,
+          "conditional_cluster_weights": {
+            "0": 0.75,
+            "1": 0.5,
+            "2": 0.5
+          }
+        },
+        {
+          "fold": 4,
+          "model_pair": [
+            "cost_rbf_svm_c0_3_204",
+            "cost_rbf_svm_204"
+          ],
+          "global_alpha": 0.7000000000000001,
+          "conditional_cluster_weights": {
+            "0": 0.65,
+            "1": 0.25,
+            "2": 0.0
+          }
+        },
+        {
+          "fold": 5,
+          "model_pair": [
+            "rbf_svm_c3_204",
+            "cost_rbf_svm_c0_3_204"
+          ],
+          "global_alpha": 0.45,
+          "conditional_cluster_weights": {
+            "0": 1.0,
+            "1": 0.0,
+            "2": 0.0
+          }
+        }
+      ],
+      "global_blend": {
+        "normalized_minDCF": 0.2389484951447237,
+        "minDCF_threshold": 0.8631288469183018,
+        "FAR_at_minDCF": 0.004634738468329287,
+        "miss_rate_at_minDCF": 0.19569093610698365,
+        "EER": 0.08827112416593237,
+        "AUC": 0.9725941778660003
+      },
+      "conditional_kmeans": {
+        "normalized_minDCF": 0.23411225011037823,
+        "minDCF_threshold": 0.787080281708994,
+        "FAR_at_minDCF": 0.005517545795630104,
+        "miss_rate_at_minDCF": 0.1826151560178306,
+        "EER": 0.08631214125704287,
+        "AUC": 0.9730415171955585
+      },
+      "conditional_improves_each_fold": [
+        false,
+        false,
+        false,
+        true,
+        false
+      ]
+    },
+    "model_selection": "lowest grouped-OOF minDCF: rbf_svm_c3_204",
+    "deployable_204_feature_model": "rbf_svm_c3_204"
+  },
+  "unseen_attack_development": {
+    "status": "never fit; never used to select models, weights, or thresholds",
+    "official_dev_count": 2000,
+    "real": 1000,
+    "synthetic": 1000,
+    "complete_source_groups": 770,
+    "unseen_attack_families": [
+      "A09",
+      "A10",
+      "A11",
+      "A12",
+      "A13",
+      "A14",
+      "A15",
+      "A16"
+    ],
+    "model_metrics": {
+      "rbf_svm_c3_204": {
+        "normalized_minDCF": 0.36366666666666664,
+        "minDCF_threshold": 0.7132036463786862,
+        "FAR_at_minDCF": 0.008,
+        "miss_rate_at_minDCF": 0.289,
+        "EER": 0.129,
+        "AUC": 0.9199459999999999
+      },
+      "cost_rbf_svm_c3_204": {
+        "normalized_minDCF": 0.3646666666666667,
+        "minDCF_threshold": 0.6780051844135802,
+        "FAR_at_minDCF": 0.011,
+        "miss_rate_at_minDCF": 0.262,
+        "EER": 0.131,
+        "AUC": 0.919554
+      },
+      "cost_rbf_svm_204": {
+        "normalized_minDCF": 0.35633333333333334,
+        "minDCF_threshold": 0.6862274012793138,
+        "FAR_at_minDCF": 0.01,
+        "miss_rate_at_minDCF": 0.263,
+        "EER": 0.1345,
+        "AUC": 0.9184939999999999
+      },
+      "cost_rbf_svm_c0_3_204": {
+        "normalized_minDCF": 0.379,
+        "minDCF_threshold": 0.6654803798440893,
+        "FAR_at_minDCF": 0.009,
+        "miss_rate_at_minDCF": 0.295,
+        "EER": 0.13,
+        "AUC": 0.915265
+      },
+      "rbf_svm_204": {
+        "normalized_minDCF": 0.368,
+        "minDCF_threshold": 0.6107613947800923,
+        "FAR_at_minDCF": 0.015,
+        "miss_rate_at_minDCF": 0.228,
+        "EER": 0.125,
+        "AUC": 0.918898
+      },
+      "cost_logistic_204": {
+        "normalized_minDCF": 0.3943333333333333,
+        "minDCF_threshold": 0.5958873629570007,
+        "FAR_at_minDCF": 0.01,
+        "miss_rate_at_minDCF": 0.301,
+        "EER": 0.15950000000000003,
+        "AUC": 0.8978079999999999
+      },
+      "rbf_svm_c0_3_204": {
+        "normalized_minDCF": 0.437,
+        "minDCF_threshold": 0.6589432158941964,
+        "FAR_at_minDCF": 0.012,
+        "miss_rate_at_minDCF": 0.325,
+        "EER": 0.1305,
+        "AUC": 0.912602
+      },
+      "logistic_204": {
+        "normalized_minDCF": 0.428,
+        "minDCF_threshold": 0.8498702049255371,
+        "FAR_at_minDCF": 0.015,
+        "miss_rate_at_minDCF": 0.288,
+        "EER": 0.15650000000000003,
+        "AUC": 0.903959
+      },
+      "extra_trees_base": {
+        "normalized_minDCF": 0.78,
+        "minDCF_threshold": 0.7750460792867514,
+        "FAR_at_minDCF": 0.006,
+        "miss_rate_at_minDCF": 0.724,
+        "EER": 0.22499999999999998,
+        "AUC": 0.8440240000000001
+      },
+      "logistic_temporal": {
+        "normalized_minDCF": 0.9843333333333332,
+        "minDCF_threshold": 0.9676186442375183,
+        "FAR_at_minDCF": 0.004,
+        "miss_rate_at_minDCF": 0.947,
+        "EER": 0.36,
+        "AUC": 0.675775
+      },
+      "unchanged_current_hearsay_model": {
+        "normalized_minDCF": 0.711,
+        "minDCF_threshold": 0.8910705787934614,
+        "FAR_at_minDCF": 0.009,
+        "miss_rate_at_minDCF": 0.627,
+        "EER": 0.22599999999999998,
+        "AUC": 0.8629269999999999
+      }
+    },
+    "rates_at_oof_thresholds": {
+      "rbf_svm_c3_204": {
+        "oof_selected_threshold": 0.7419149748556135,
+        "dev_FAR_at_oof_threshold": 0.007,
+        "dev_miss_at_oof_threshold": 0.318
+      },
+      "cost_rbf_svm_c3_204": {
+        "oof_selected_threshold": 0.7426045614394321,
+        "dev_FAR_at_oof_threshold": 0.007,
+        "dev_miss_at_oof_threshold": 0.313
+      },
+      "cost_rbf_svm_204": {
+        "oof_selected_threshold": 0.7707206386926388,
+        "dev_FAR_at_oof_threshold": 0.007,
+        "dev_miss_at_oof_threshold": 0.353
+      },
+      "cost_rbf_svm_c0_3_204": {
+        "oof_selected_threshold": 0.7536635771153094,
+        "dev_FAR_at_oof_threshold": 0.007,
+        "dev_miss_at_oof_threshold": 0.387
+      },
+      "rbf_svm_204": {
+        "oof_selected_threshold": 0.8221282405295317,
+        "dev_FAR_at_oof_threshold": 0.006,
+        "dev_miss_at_oof_threshold": 0.419
+      },
+      "cost_logistic_204": {
+        "oof_selected_threshold": 0.8789721727371216,
+        "dev_FAR_at_oof_threshold": 0.002,
+        "dev_miss_at_oof_threshold": 0.418
+      },
+      "rbf_svm_c0_3_204": {
+        "oof_selected_threshold": 0.8335737093637894,
+        "dev_FAR_at_oof_threshold": 0.005,
+        "dev_miss_at_oof_threshold": 0.489
+      },
+      "logistic_204": {
+        "oof_selected_threshold": 0.9412925243377686,
+        "dev_FAR_at_oof_threshold": 0.007,
+        "dev_miss_at_oof_threshold": 0.382
+      },
+      "extra_trees_base": {
+        "oof_selected_threshold": 0.7215410865470242,
+        "dev_FAR_at_oof_threshold": 0.015,
+        "dev_miss_at_oof_threshold": 0.683
+      },
+      "logistic_temporal": {
+        "oof_selected_threshold": 0.8864428997039795,
+        "dev_FAR_at_oof_threshold": 0.034,
+        "dev_miss_at_oof_threshold": 0.848
+      }
+    },
+    "per_unseen_attack_recall": {
+      "asvspoof5:spoof:A09": {
+        "spoof_examples": 125,
+        "recall_at_oof_selected_threshold": {
+          "rbf_svm_c3_204": 0.68,
+          "cost_rbf_svm_c3_204": 0.704,
+          "cost_rbf_svm_204": 0.68,
+          "cost_rbf_svm_c0_3_204": 0.6,
+          "rbf_svm_204": 0.528,
+          "cost_logistic_204": 0.712,
+          "rbf_svm_c0_3_204": 0.424,
+          "logistic_204": 0.808,
+          "extra_trees_base": 0.0,
+          "logistic_temporal": 0.2
+        }
+      },
+      "asvspoof5:spoof:A10": {
+        "spoof_examples": 125,
+        "recall_at_oof_selected_threshold": {
+          "rbf_svm_c3_204": 0.664,
+          "cost_rbf_svm_c3_204": 0.688,
+          "cost_rbf_svm_204": 0.656,
+          "cost_rbf_svm_c0_3_204": 0.56,
+          "rbf_svm_204": 0.504,
+          "cost_logistic_204": 0.76,
+          "rbf_svm_c0_3_204": 0.312,
+          "logistic_204": 0.8,
+          "extra_trees_base": 0.0,
+          "logistic_temporal": 0.16
+        }
+      },
+      "asvspoof5:spoof:A11": {
+        "spoof_examples": 125,
+        "recall_at_oof_selected_threshold": {
+          "rbf_svm_c3_204": 0.76,
+          "cost_rbf_svm_c3_204": 0.76,
+          "cost_rbf_svm_204": 0.76,
+          "cost_rbf_svm_c0_3_204": 0.784,
+          "rbf_svm_204": 0.712,
+          "cost_logistic_204": 0.856,
+          "rbf_svm_c0_3_204": 0.704,
+          "logistic_204": 0.848,
+          "extra_trees_base": 0.48,
+          "logistic_temporal": 0.424
+        }
+      },
+      "asvspoof5:spoof:A12": {
+        "spoof_examples": 125,
+        "recall_at_oof_selected_threshold": {
+          "rbf_svm_c3_204": 0.0,
+          "cost_rbf_svm_c3_204": 0.0,
+          "cost_rbf_svm_204": 0.0,
+          "cost_rbf_svm_c0_3_204": 0.0,
+          "rbf_svm_204": 0.0,
+          "cost_logistic_204": 0.0,
+          "rbf_svm_c0_3_204": 0.0,
+          "logistic_204": 0.0,
+          "extra_trees_base": 0.0,
+          "logistic_temporal": 0.024
+        }
+      },
+      "asvspoof5:spoof:A13": {
+        "spoof_examples": 125,
+        "recall_at_oof_selected_threshold": {
+          "rbf_svm_c3_204": 0.912,
+          "cost_rbf_svm_c3_204": 0.912,
+          "cost_rbf_svm_204": 0.912,
+          "cost_rbf_svm_c0_3_204": 0.888,
+          "rbf_svm_204": 0.856,
+          "cost_logistic_204": 0.416,
+          "rbf_svm_c0_3_204": 0.768,
+          "logistic_204": 0.416,
+          "extra_trees_base": 0.72,
+          "logistic_temporal": 0.144
+        }
+      },
+      "asvspoof5:spoof:A14": {
+        "spoof_examples": 125,
+        "recall_at_oof_selected_threshold": {
+          "rbf_svm_c3_204": 0.984,
+          "cost_rbf_svm_c3_204": 0.976,
+          "cost_rbf_svm_204": 0.984,
+          "cost_rbf_svm_c0_3_204": 0.992,
+          "rbf_svm_204": 0.976,
+          "cost_logistic_204": 0.96,
+          "rbf_svm_c0_3_204": 0.968,
+          "logistic_204": 0.976,
+          "extra_trees_base": 1.0,
+          "logistic_temporal": 0.08
+        }
+      },
+      "asvspoof5:spoof:A15": {
+        "spoof_examples": 125,
+        "recall_at_oof_selected_threshold": {
+          "rbf_svm_c3_204": 0.68,
+          "cost_rbf_svm_c3_204": 0.68,
+          "cost_rbf_svm_204": 0.512,
+          "cost_rbf_svm_c0_3_204": 0.44,
+          "rbf_svm_204": 0.456,
+          "cost_logistic_204": 0.344,
+          "rbf_svm_c0_3_204": 0.368,
+          "logistic_204": 0.416,
+          "extra_trees_base": 0.04,
+          "logistic_temporal": 0.008
+        }
+      },
+      "asvspoof5:spoof:A16": {
+        "spoof_examples": 125,
+        "recall_at_oof_selected_threshold": {
+          "rbf_svm_c3_204": 0.776,
+          "cost_rbf_svm_c3_204": 0.776,
+          "cost_rbf_svm_204": 0.672,
+          "cost_rbf_svm_c0_3_204": 0.64,
+          "rbf_svm_204": 0.616,
+          "cost_logistic_204": 0.608,
+          "rbf_svm_c0_3_204": 0.544,
+          "logistic_204": 0.68,
+          "extra_trees_base": 0.296,
+          "logistic_temporal": 0.176
+        }
+      }
+    },
+    "routing": {
+      "models": [
+        "rbf_svm_c3_204",
+        "cost_rbf_svm_c3_204"
+      ],
+      "global_blend": {
+        "normalized_minDCF": 0.36766666666666664,
+        "minDCF_threshold": 0.6827108139646894,
+        "FAR_at_minDCF": 0.011,
+        "miss_rate_at_minDCF": 0.265,
+        "EER": 0.132,
+        "AUC": 0.9195949999999999
+      },
+      "conditional_kmeans": {
+        "normalized_minDCF": 0.3646666666666667,
+        "minDCF_threshold": 0.7132036463786862,
+        "FAR_at_minDCF": 0.008,
+        "miss_rate_at_minDCF": 0.29,
+        "EER": 0.1285,
+        "AUC": 0.9199030000000001
+      },
+      "router_training_summary": {
+        "p_spoof": 0.3,
+        "c_miss": 1.0,
+        "c_fa": 4.0,
+        "global_blend_alpha": 0.15000000000000002,
+        "global_blend_min_dcf": 0.21813187431823192,
+        "conditional_min_dcf_in_sample": 0.21859799352629825,
+        "cluster_sizes": {
+          "0": 1139,
+          "1": 10049,
+          "2": 73
+        },
+        "quality_features": [
+          "duration_seconds",
+          "peak_level",
+          "rms_level",
+          "clipped_fraction",
+          "active_fraction",
+          "spectral_flatness",
+          "high_frequency_fraction",
+          "low_frequency_fraction",
+          "spectral_flux",
+          "bytes_per_second",
+          "has_metadata",
+          "has_encoder_tag"
+        ],
+        "note": "Choose final policy using grouped out-of-fold predictions; this fit metric is descriptive."
+      }
+    },
+    "candidate_model_artifact": "models/asvspoof5_lfcc_candidate.joblib"
+  },
+  "limitations": [
+    "ASVspoof development metrics are an external generalization benchmark, not the Hearsay organizer's hidden test result.",
+    "MinDCF is threshold-swept; a monotonic remapping such as multiplying every score by a constant cannot change minDCF or EER.",
+    "Development-set minDCF is reported descriptively; never tune a submission on this partition."
+  ]
+}

@@ -36,7 +36,8 @@ class RoutingInputTests(unittest.TestCase):
         ])
         rows, files, labels = read_rows(self.score_file, "arshiya_score", "julia_score")
         self.assertEqual([row["group"] for row in rows], ["speaker_1", "generator_1"])
-        self.assertEqual(files, [self.root / "real.wav", self.root / "spoof.wav"])
+        self.assertEqual(files, [(self.root / "real.wav").resolve(),
+                                 (self.root / "spoof.wav").resolve()])
         self.assertEqual(labels.tolist(), [0, 1])
 
     def test_rejects_invalid_scores_duplicate_files_and_missing_groups(self) -> None:

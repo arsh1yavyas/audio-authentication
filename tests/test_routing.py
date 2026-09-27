@@ -5,6 +5,7 @@ from __future__ import annotations
 import unittest
 
 import numpy as np
+from sklearn.metrics import roc_auc_score
 
 from hearsay.routing import dcf_at_cutoff, fit_router, min_dcf
 
@@ -35,6 +36,13 @@ class RoutingTest(unittest.TestCase):
         cost, threshold = min_dcf(labels, identical, c_miss=4.0, c_fa=1.0)
         self.assertEqual(cost, 1.0)
         self.assertEqual(threshold, 0.5)  # Every clip is rejected as spoof.
+
+    def test_positive_score_shrink_preserves_mindcf_and_ranking(self) -> None:
+        labels = np.asarray([0, 0, 0, 1, 1, 1])
+        scores = np.asarray([0.12, 0.48, 0.73, 0.41, 0.82, 0.95])
+        shrunk = scores * 0.05
+        self.assertEqual(min_dcf(labels, scores)[0], min_dcf(labels, shrunk)[0])
+        self.assertEqual(roc_auc_score(labels, scores), roc_auc_score(labels, shrunk))
 
     def test_min_dcf_rejects_nonpositive_costs(self) -> None:
         labels = np.asarray([0, 1])
@@ -68,7 +76,7 @@ class RoutingTest(unittest.TestCase):
         arshiya = np.clip(0.25 + 0.5 * labels + rng.normal(0, 0.08, len(labels)), 0, 1)
         julia = np.clip(0.35 + 0.4 * labels + rng.normal(0, 0.08, len(labels)), 0, 1)
         router = fit_router(quality, labels, arshiya, julia, clusters=2, minimum_cluster_size=20)
-        result = router.predict(arshiya[:8], julia[:8], quality[:8])
+        result = router.predict(arshiya[:8], julia[:8], quality[:8].astype(np.float32))
         self.assertEqual(result.shape, (8,))
         self.assertTrue(np.all(np.isfinite(result)))
         self.assertTrue(np.all((result >= 0) & (result <= 1)))

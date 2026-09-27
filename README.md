@@ -277,6 +277,64 @@ Older report files retain their historical metric values; no Hearsay test labels
 
 These external-source checks improve coverage of real-speaker variation, but the synthetic side remains DiffSSD. They are not a substitute for evaluation on a separate corpus containing both bona fide and spoof speech, such as the larger ASVspoof 5 corpus referenced by the challenge organizers.
 
+## Unseen-generator benchmark (ASVspoof 5)
+
+`scripts/prepare_asvspoof5.py` builds manifests from official Track 1 protocols and locally extracted FLAC shards. It groups bona fide audio by speaker and spoof audio by attack family, so neither group is split across training folds. The benchmark runner combines the Hearsay training set with balanced samples from ASVspoof 5 `T_aa`, selects models only from five grouped out-of-fold predictions, and evaluates once on the separate `D_aa` development shard. The latter contains attack families absent from `T_aa`. Its report compares the 84-feature ExtraTrees model, 204-feature logistic regression and RBF SVM with balanced and false-alarm-cost class weights, an ordered temporal-feature model, and a cross-fitted K-means condition router. The ASVspoof development partition is never used for model fitting, score-weight selection, or threshold selection.
+
+The official audio and protocol archives are available from the [ASVspoof 5 dataset record](https://zenodo.org/records/14498691). The audio is large. Keep downloaded and extracted files under `data/external/asvspoof5` (ignored by Git), and follow the source dataset's ODC-By terms. After obtaining `flac_T_aa.tar` and `flac_D_aa.tar`, prepare and run the benchmark as follows:
+
+Published ASVspoof challenge systems pair pretrained Wav2Vec2/WavLM representations with anti-spoof classifiers, then test channel, room, time-mask, and codec augmentations. A separate temporal/multi-view study also reports a large gap between its progress-set and full-evaluation results. That supports this branch's unseen-family holdout and argues against selecting a model from a single convenient split. The current scorer stays with the repository's CPU-friendly scikit-learn stack; pretrained SSL inference would add a large model and PyTorch dependency to the Docker image. See the [ASVspoof 5 system description](https://arxiv.org/abs/2408.09933) and [temporal multi-view study](https://arxiv.org/abs/2408.06922).
+
+```sh
+mkdir -p data/external/asvspoof5/audio/train data/external/asvspoof5/audio/dev
+tar -xf data/external/asvspoof5/flac_T_aa.tar -C data/external/asvspoof5/audio/train
+tar -xf data/external/asvspoof5/flac_D_aa.tar -C data/external/asvspoof5/audio/dev
+python scripts/prepare_asvspoof5.py --partition train \
+  --audio-root data/external/asvspoof5/audio/train \
+  --output data/external/asvspoof5/manifests/train.tsv
+python scripts/prepare_asvspoof5.py --partition dev \
+  --audio-root data/external/asvspoof5/audio/dev \
+  --output data/external/asvspoof5/manifests/dev.tsv
+python scripts/evaluate_asvspoof5.py --workers 6
+```
+
+Feature extraction is cached and resumes after interruption. The run also saves `models/asvspoof5_lfcc_candidate.joblib`, selected only from grouped training OOF scores and accepted by the existing `predict-lfcc` command; the report compares that candidate against the unchanged Hearsay model on the unseen-attack shard. Review those results before replacing the default model. A monotonic score remapping cannot change minDCF or EER because both metrics sweep the threshold; improving either requires changing which real and spoof clips the model ranks above one another. Lowering probabilities can still affect a fixed deployment threshold, but it is a calibration/operating-point change, not a ranking improvement.
+
+### Scoring flow
+
+```mermaid
+flowchart TD
+    A[Audio file] --> B[Decode to mono 16 kHz]
+    B --> C[Validate duration and signal]
+    C --> D[Extract baseline spectral/MFCC/chroma features]
+    C --> E[Extract LFCC static and delta features]
+    D --> F[Concatenate 84 + 120 = 204 features]
+    E --> F
+    F --> G[Standardize features]
+    G --> H[RBF SVM, calibrated probabilities]
+    H --> I[Score: higher means synthetic]
+    I --> J[TSV filename and cm-score]
+```
+
+The benchmark also computes an ordered temporal feature view (eight time bins of energy, zero-crossing rate, spectral centroid, flatness, flux, and band energy). It is an evaluated candidate, not automatically blended into the final score. Likewise, the quality-feature K-means router clusters recording conditions and learns a blend between the baseline model and Julia's score only from training OOF predictions. This is a conditional *model-weight* rule, not an if/else detector for “real” or “synthetic.” Keep it only if it improves held-out folds and the separate dev check.
+
+### What each method contributes
+
+- **Baseline spectral features:** Summaries of spectral shape, MFCCs, chroma, energy, and frame-to-frame changes. This is compact and runs on CPU, but averaging over a whole clip loses some time order.
+- **LFCC:** Uses evenly spaced frequency filters, preserving fine detail across frequency. Static coefficients describe timbre; first and second deltas describe how the spectrum changes. Mean and standard deviation create a fixed-size 120-value representation.
+- **RBF SVM:** A nonlinear margin classifier over standardized baseline+LFCC features. Sigmoid calibration maps its decision values to scores usable as spoof probabilities; scores are still ranking evidence, not guaranteed calibrated real-world probabilities.
+- **Cost-sensitive training:** Sets the real-class sample weight using the challenge's 4x false-alarm cost and 30% spoof prior. The evaluation metric also includes those costs. This training weight is a candidate design choice, not a guarantee of fewer false alarms; FAR must be measured at a stated threshold.
+- **C sweep:** The benchmark compares RBF-SVM regularization strengths `C=0.3, 1, 3`, with both balanced and cost-sensitive class weights. The weakest setting underfits in this experiment; `C=3` had the lowest combined grouped-OOF minDCF by a very small margin. It is compared against the unseen dev set before describing it as a practical improvement.
+- **Temporal model:** Tests speech dynamics directly. On the current benchmark it is weak by itself, so it should not be granted a blend weight without new evidence.
+- **K-means routing:** Unsupervised clusters over recording-quality descriptors (duration, clipping, activity, flatness, band fractions, flux, metadata/encoder tags). A cluster-specific blend is learned only where training examples are sufficient. It is a small hypothesis to test, not a primary detector.
+- **minDCF:** For a threshold `t`, clips scoring at or above `t` are called spoof. With `Pspoof=.3`, `Cmiss=1`, and `Cfa=4`, normalized cost is `FNR + 9.333 × FPR`. `minDCF` sweeps all thresholds, so a uniform score shrink cannot improve it; the model must improve the ordering of real versus synthetic scores.
+
+### Latest measured run
+
+The saved report used 11,261 combined training clips (1,460 Hearsay plus 9,801 ASVspoof 5) and a balanced 2,000-clip dev sample (1,000 per class) covering all eight unseen attack families A09–A16. Five grouped folds held out complete real-speaker and spoof-family groups. The best selected C-sweep candidate had grouped-OOF minDCF `0.2190` and EER `7.74%`; on sampled unseen dev it had minDCF `0.3637`, EER `12.9%`, and AUC `0.9199`. The unchanged Hearsay model had dev minDCF `0.7110`, EER `22.6%`, and AUC `0.8629`. At the candidate's OOF-selected threshold, sampled dev FAR was `0.7%` and miss rate `31.8%`.
+
+This is evidence of improved separation on the sampled external corpus, not a measured Hearsay hidden-test improvement. Earlier cost-sensitive `C=1` had slightly better dev minDCF (`0.3563`) while the new `C=3` candidate won combined OOF by only `0.0002`; that difference is small enough to be validation noise. K-means routing improved sampled dev minDCF only from `0.3677` to `0.3647`, and helped only one of five grouped OOF folds, so it is not a robust improvement. One bona fide dev clip was shorter than the pipeline's 0.5-second minimum and was excluded. Do not use these dev labels to tune thresholds or claim challenge-score gains.
+
 ## Nested fusion experiment
 
 To assess Arshiya+Julia fusion without changing the default scorer, run:

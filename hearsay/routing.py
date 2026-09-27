@@ -24,7 +24,14 @@ class ConditionalRouter:
 
     def predict_alpha(self, quality: np.ndarray) -> np.ndarray:
         matrix = np.atleast_2d(quality)
-        clusters = self.clusterer.predict(self.scaler.transform(matrix))
+        scaled = self.scaler.transform(matrix)
+        # scikit-learn's KMeans requires prediction inputs to match the dtype
+        # used for its learned centroids. Cached quality vectors are float32,
+        # while StandardScaler can return float64, so align explicitly.
+        centers = getattr(self.clusterer, "cluster_centers_", None)
+        if centers is not None:
+            scaled = np.asarray(scaled, dtype=np.asarray(centers).dtype)
+        clusters = self.clusterer.predict(scaled)
         return np.asarray([self.cluster_alphas.get(int(c), self.global_alpha) for c in clusters])
 
     def predict(self, arshiya: np.ndarray, julia: np.ndarray,
