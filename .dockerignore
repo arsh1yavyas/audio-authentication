@@ -12,3 +12,4 @@ models/*
 !models/arshiya_julia_lfcc_lowpass.joblib
 !models/arshiya_lfcc_lowpass_candidate.joblib
 !models/arshiya_librispeech_julia_lfcc.joblib
+!models/asvspoof5_lfcc_candidate.joblib
