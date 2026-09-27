@@ -8,6 +8,7 @@ from pathlib import Path
 import imageio_ffmpeg
 import librosa
 import numpy as np
+from scipy.signal import butter, sosfiltfilt
 
 SAMPLE_RATE = 16_000
 MAX_SECONDS = 120
@@ -57,17 +58,29 @@ def decode_audio(path: Path) -> np.ndarray:
     return audio
 
 
+def lowpass_audio(audio: np.ndarray, cutoff_hz: float) -> np.ndarray:
+    """Band-limit decoded audio for a source-bandwidth robustness experiment."""
+    signal = np.asarray(audio, dtype=np.float64)
+    if signal.ndim != 1 or not np.all(np.isfinite(signal)):
+        raise ValueError("Low-pass input must be a finite mono waveform")
+    if not 0.0 < cutoff_hz < SAMPLE_RATE / 2:
+        raise ValueError(f"Cutoff must lie between 0 and {SAMPLE_RATE / 2} Hz")
+    # A modest Butterworth transition avoids the ringing of a hard spectral cut.
+    sections = butter(6, cutoff_hz, btype="lowpass", fs=SAMPLE_RATE, output="sos")
+    return sosfiltfilt(sections, signal).astype(np.float32)
+
+
 def _summarize(values: np.ndarray) -> list[float]:
     return [float(np.mean(values)), float(np.std(values))]
 
 
-def extract_features(path: Path) -> np.ndarray:
+def extract_features(path: Path, audio: np.ndarray | None = None) -> np.ndarray:
     """Return STFT, MFCC, chroma, and six statistical feature families.
 
     The STFT is represented by spectral flux and three relative frequency bands.
     Mean and standard deviation retain some time variation in a fixed-size vector.
     """
-    audio = decode_audio(path)
+    audio = decode_audio(path) if audio is None else audio
     # Peak normalization removes arbitrary recording gain while preserving dynamics.
     audio = audio / np.max(np.abs(audio))
     signal = audio.astype(np.float32)

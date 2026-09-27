@@ -114,7 +114,10 @@ def write_split_manifests(manifest: Path, output: Path, *, test_size: float = 0.
             writer = csv.writer(stream)
             writer.writerow(columns)
             for index in indices:
-                relative = Path(os.path.relpath(files[index], destination.parent)).as_posix()
+                # Resolve the destination too, so macOS /var -> /private/var
+                # aliases do not produce doubled /private path components.
+                relative = Path(os.path.relpath(
+                    files[index], destination.parent.resolve())).as_posix()
                 row = [relative, "synthetic" if labels[index] else "real"]
                 if groups is not None:
                     row.append(groups[index])

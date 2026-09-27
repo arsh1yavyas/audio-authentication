@@ -14,12 +14,19 @@ from unittest.mock import patch
 
 import numpy as np
 import imageio_ffmpeg
+import joblib
+from sklearn.ensemble import ExtraTreesClassifier
 
 from hearsay.__main__ import main
 from hearsay.features import FEATURE_NAMES, extract_features
-from hearsay.metadata import METADATA_REAL_WEIGHT, adjust_score, analyze_metadata
+from hearsay.metadata import (METADATA_REAL_WEIGHT, MetadataAnalysis, adjust_score,
+                              analyze_metadata)
+from hearsay.lfcc import LFCC_FEATURE_NAMES, extract_lfcc_features
 from hearsay.model import explain, load_model, train
+from hearsay.routing import min_dcf
+from hearsay.temporal import TEMPORAL_FEATURE_NAMES, extract_temporal_features
 from hearsay.utils import read_manifest, split_data, write_split_manifests
+from scripts.train_optimized import summarize as summarize_optimized
 
 
 def write_wave(path: Path, frequency: float, noise: float, seed: int) -> None:
@@ -36,6 +43,16 @@ def write_wave(path: Path, frequency: float, noise: float, seed: int) -> None:
 
 
 class PipelineTest(unittest.TestCase):
+    def test_julia_optimizer_reports_hearsay_costs(self) -> None:
+        labels = np.asarray([0, 0, 0, 1, 1, 1])
+        scores = np.asarray([0.1, 0.4, 0.6, 0.2, 0.7, 0.9])
+        report = summarize_optimized(labels, scores)
+        expected, threshold = min_dcf(labels, scores, p_spoof=0.3, c_miss=1.0, c_fa=4.0)
+        self.assertAlmostEqual(report["min_dcf"], expected)
+        self.assertEqual(report["min_dcf_threshold"], threshold)
+        self.assertEqual(report["min_dcf_config"],
+                         {"p_spoof": 0.3, "c_miss": 1.0, "c_fa": 4.0})
+
     def test_saved_optimized_model_score_explanation(self) -> None:
         model_path = Path(__file__).resolve().parents[1] / "models" / "hearsay-optimized.joblib"
         model = load_model(model_path)
@@ -106,6 +123,12 @@ class PipelineTest(unittest.TestCase):
         self.assertEqual(set(train_idx) & set(test_idx), set())
         self.assertEqual(set(labels[train_idx]), {0, 1})
         self.assertEqual(set(labels[test_idx]), {0, 1})
+    def test_metadata_adjustment_is_small_and_missing_is_neutral(self) -> None:
+        self.assertAlmostEqual(adjust_score(0.8, MetadataAnalysis("consistent")), 0.76)
+        self.assertAlmostEqual(adjust_score(0.8, MetadataAnalysis("inconsistent")), 0.8)
+        self.assertAlmostEqual(adjust_score(0.8, MetadataAnalysis("unknown")), 0.8)
+        with self.assertRaises(ValueError):
+            adjust_score(1.1, MetadataAnalysis("consistent"))
 
     def test_mp3_and_m4a_decode(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -171,6 +194,66 @@ class PipelineTest(unittest.TestCase):
             self.assertEqual(output.read_text(), explained_output.read_text())
             self.assertEqual(len([json.loads(line) for line in explanations.read_text().splitlines()]),
                              len(paths))
+
+            temporal_features = np.vstack([extract_temporal_features(path) for path in paths])
+            temporal_labels = np.asarray([0 if i < 6 else 1 for i in range(len(paths))])
+            temporal_model = ExtraTreesClassifier(n_estimators=10, random_state=3).fit(
+                temporal_features, temporal_labels)
+            temporal_path = folder / "temporal.joblib"
+            joblib.dump({"model": temporal_model, "feature_names": TEMPORAL_FEATURE_NAMES,
+                         "version": 1, "kind": "experimental-temporal"}, temporal_path)
+            policy = folder / "fusion_policy.json"
+            policy.write_text(json.dumps({"temporal_weight": 0.5,
+                                          "metadata_real_weight": 0.05}), encoding="utf-8")
+            fused_output = folder / "fused.tsv"
+            self.assertEqual(main([
+                "predict-fused", "--model", str(model_path),
+                "--temporal-model", str(temporal_path), "--policy", str(policy),
+                "--input", str(folder), "--template", str(template),
+                "--output", str(fused_output),
+            ]), 0)
+            with fused_output.open("r", newline="", encoding="utf-8") as stream:
+                fused_rows = list(csv.DictReader(stream, delimiter="\t"))
+            self.assertEqual([row["filename"] for row in fused_rows],
+                             [path.name for path in reversed(paths)])
+            self.assertTrue(all(0.0 <= float(row["cm-score"]) <= 1.0
+                                for row in fused_rows))
+
+            combined_features = np.vstack([
+                np.concatenate((extract_features(path), extract_lfcc_features(path)))
+                for path in paths
+            ])
+            lfcc_model = ExtraTreesClassifier(n_estimators=10, random_state=4).fit(
+                combined_features, temporal_labels)
+            lfcc_path = folder / "baseline_lfcc.joblib"
+            joblib.dump({"model": lfcc_model,
+                         "feature_names": (*FEATURE_NAMES, *LFCC_FEATURE_NAMES),
+                         "version": 1, "kind": "experimental-baseline-plus-lfcc"}, lfcc_path)
+            lfcc_output = folder / "lfcc.tsv"
+            self.assertEqual(main([
+                "predict-lfcc", "--model", str(lfcc_path), "--input", str(folder),
+                "--template", str(template), "--output", str(lfcc_output),
+            ]), 0)
+            with lfcc_output.open("r", newline="", encoding="utf-8") as stream:
+                lfcc_rows = list(csv.DictReader(stream, delimiter="\t"))
+            self.assertEqual([row["filename"] for row in lfcc_rows],
+                             [path.name for path in reversed(paths)])
+            self.assertTrue(all(0.0 <= float(row["cm-score"]) <= 1.0
+                                for row in lfcc_rows))
+            lowpass_lfcc_path = folder / "baseline_lfcc_lowpass.joblib"
+            joblib.dump({"model": lfcc_model,
+                         "feature_names": (*FEATURE_NAMES, *LFCC_FEATURE_NAMES),
+                         "version": 1, "kind": "experimental-baseline-plus-lfcc",
+                         "lowpass_hz": 7_000.0}, lowpass_lfcc_path)
+            lowpass_lfcc_output = folder / "lfcc_lowpass.tsv"
+            self.assertEqual(main([
+                "predict-lfcc", "--model", str(lowpass_lfcc_path), "--input", str(folder),
+                "--template", str(template), "--output", str(lowpass_lfcc_output),
+            ]), 0)
+            with lowpass_lfcc_output.open("r", newline="", encoding="utf-8") as stream:
+                lowpass_rows = list(csv.DictReader(stream, delimiter="\t"))
+            self.assertEqual([row["filename"] for row in lowpass_rows],
+                             [path.name for path in reversed(paths)])
 
 
 if __name__ == "__main__":

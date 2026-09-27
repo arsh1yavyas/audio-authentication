@@ -1,0 +1,23 @@
+{
+  "temporal_weight": 0.5,
+  "metadata_real_weight": 0.05,
+  "selection": "fixed 50/50 audio-temporal blend plus Julia's fixed 5% metadata prior",
+  "reason": "Per-fold nested grid choices were unstable and scored worse on outer folds than the fixed blend.",
+  "nested_selected_temporal_weights": [
+    0.0,
+    0.5,
+    0.5,
+    0.0,
+    0.0
+  ],
+  "nested_selected_metadata_weights": [
+    0.1,
+    0.025,
+    0.05,
+    0.075,
+    0.075
+  ],
+  "manifest_sha256": "bcf9397f775193eca91a58698c1f25cbbb7dd088f2833868cb4b4543e2345117",
+  "metric": "normalized minDCF; Pspoof=.3, Cmiss=1, Cfa=4",
+  "validation": "5-fold StratifiedGroupKFold"
+}

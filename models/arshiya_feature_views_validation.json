@@ -1,0 +1,211 @@
+{
+  "validation": "5-fold StratifiedGroupKFold; real speakers and synthetic generators kept within folds",
+  "samples": 726,
+  "real": 242,
+  "synthetic": 484,
+  "group_count": 60,
+  "metric": "normalized minDCF (Pspoof=.3, Cmiss=1, Cfa=4); lower is better",
+  "feature_dimensions": {
+    "baseline": 84,
+    "temporal": 136,
+    "encoding_header": 7,
+    "encoding_signal": 7,
+    "encoding_combined": 14
+  },
+  "out_of_fold_results": {
+    "baseline": {
+      "normalized_min_dcf": 0.3807556080283353,
+      "roc_auc": 0.8711751246499555,
+      "average_precision": 0.9432615270857353
+    },
+    "temporal": {
+      "normalized_min_dcf": 0.45720188902007086,
+      "roc_auc": 0.8364438904446418,
+      "average_precision": 0.9283156827651051
+    },
+    "encoding_header": {
+      "normalized_min_dcf": 0.09917355371900827,
+      "roc_auc": 0.9106618400382487,
+      "average_precision": 0.9669421487603307
+    },
+    "encoding_signal": {
+      "normalized_min_dcf": 0.04309327036599764,
+      "roc_auc": 0.9989754798169523,
+      "average_precision": 0.9994823952572645
+    },
+    "encoding_combined": {
+      "normalized_min_dcf": 0.002066115702479339,
+      "roc_auc": 0.9999914623318079,
+      "average_precision": 0.9999957399676238
+    }
+  },
+  "fixed_equal_weight_blends": {
+    "baseline_plus_temporal_equal": {
+      "normalized_min_dcf": 0.3568476977567887,
+      "roc_auc": 0.8667526125264668,
+      "average_precision": 0.9430302053027397
+    },
+    "baseline_plus_encoding_signal_equal": {
+      "normalized_min_dcf": 0.15318772136953956,
+      "roc_auc": 0.9807731712314733,
+      "average_precision": 0.9908382865537677
+    },
+    "all_three_signal_equal": {
+      "normalized_min_dcf": 0.19805194805194803,
+      "roc_auc": 0.9625025613004575,
+      "average_precision": 0.983068646943014
+    }
+  },
+  "blend_note": "Fixed equal weights avoid selecting weights on these same OOF labels; not a nested tuning result.",
+  "encoding_header_by_class": {
+    "real_median_source_sample_rate": 16000.0,
+    "synthetic_median_source_sample_rate": 22050.0,
+    "real_median_source_bytes_per_second": 32000.0,
+    "synthetic_median_source_bytes_per_second": 44100.0
+  },
+  "fold_group_assignments": [
+    {
+      "fold": 1,
+      "groups": [
+        "real:LJ005",
+        "real:LJ006",
+        "real:LJ012",
+        "real:LJ016",
+        "real:LJ017",
+        "real:LJ033",
+        "real:LJ036",
+        "real:LJ043",
+        "real:LJ047",
+        "real:LJ048",
+        "synthetic:diffgan_tts",
+        "synthetic:xtts_v2"
+      ]
+    },
+    {
+      "fold": 2,
+      "groups": [
+        "real:LJ007",
+        "real:LJ009",
+        "real:LJ015",
+        "real:LJ018",
+        "real:LJ026",
+        "real:LJ029",
+        "real:LJ031",
+        "real:LJ035",
+        "real:LJ044",
+        "real:LJ049",
+        "synthetic:openvoicev2",
+        "synthetic:playht"
+      ]
+    },
+    {
+      "fold": 3,
+      "groups": [
+        "real:LJ002",
+        "real:LJ003",
+        "real:LJ019",
+        "real:LJ023",
+        "real:LJ030",
+        "real:LJ032",
+        "real:LJ037",
+        "real:LJ039",
+        "real:LJ040",
+        "real:LJ045",
+        "synthetic:elevenlabs",
+        "synthetic:unit_speech"
+      ]
+    },
+    {
+      "fold": 4,
+      "groups": [
+        "real:LJ004",
+        "real:LJ008",
+        "real:LJ010",
+        "real:LJ011",
+        "real:LJ014",
+        "real:LJ021",
+        "real:LJ022",
+        "real:LJ024",
+        "real:LJ025",
+        "real:LJ046",
+        "synthetic:grad_tts",
+        "synthetic:pro_diff"
+      ]
+    },
+    {
+      "fold": 5,
+      "groups": [
+        "real:LJ001",
+        "real:LJ013",
+        "real:LJ020",
+        "real:LJ027",
+        "real:LJ028",
+        "real:LJ034",
+        "real:LJ038",
+        "real:LJ041",
+        "real:LJ042",
+        "real:LJ050",
+        "synthetic:wavegrad2",
+        "synthetic:your_tts"
+      ]
+    }
+  ],
+  "lossy_reencoding_probe": {
+    "baseline": {
+      "clips": 40,
+      "mean_absolute_score_change": 0.1445918453007624,
+      "max_absolute_score_change": 0.4941774359374968,
+      "score_rank_correlation": 0.9150093808630395
+    },
+    "temporal": {
+      "clips": 40,
+      "mean_absolute_score_change": 0.0684178571428572,
+      "max_absolute_score_change": 0.2073571428571429,
+      "score_rank_correlation": 0.9581613508442779
+    },
+    "encoding_signal": {
+      "clips": 40,
+      "mean_absolute_score_change": 0.2814667535172749,
+      "max_absolute_score_change": 0.6374399181841004,
+      "score_rank_correlation": 0.7904315196998125
+    }
+  },
+  "lossy_reencoding_note": "Exploratory paired stability probe on training clips after 64 kbps MP3 transcoding; the scores are in-sample and do not estimate accuracy.",
+  "encoding_provenance_diagnostic": {
+    "header_feature_names": [
+      "is_wav",
+      "pcm_format",
+      "channels",
+      "source_sample_rate",
+      "bits_per_sample",
+      "source_bytes_per_second",
+      "log_file_bytes_per_second"
+    ],
+    "signal_feature_names": [
+      "clip_fraction",
+      "zero_fraction",
+      "repeat_sample_fraction",
+      "unique_level_fraction",
+      "high_frequency_fraction",
+      "spectral_cutoff_fraction",
+      "spectral_flatness"
+    ],
+    "combined_feature_names": [
+      "is_wav",
+      "pcm_format",
+      "channels",
+      "source_sample_rate",
+      "bits_per_sample",
+      "source_bytes_per_second",
+      "log_file_bytes_per_second",
+      "clip_fraction",
+      "zero_fraction",
+      "repeat_sample_fraction",
+      "unique_level_fraction",
+      "high_frequency_fraction",
+      "spectral_cutoff_fraction",
+      "spectral_flatness"
+    ],
+    "warning": "High header-only performance is corpus provenance leakage, not evidence of synthesis."
+  }
+}

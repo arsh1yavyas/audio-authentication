@@ -72,6 +72,12 @@ def main() -> None:
     lj_files = sorted((args.data / "train" / "real").glob("LJ*.wav"))
     if not lj_files:
         raise ValueError("Prepare LJ/DiffSSD training data first")
+    manifest = args.data / "train.csv"
+    base_manifest = args.data / "train_pre_librispeech.csv"
+    # Preserve the smaller LJ/DiffSSD manifest for paired evaluation and
+    # reproducibility before replacing it with the LibriSpeech-augmented one.
+    if manifest.is_file() and not base_manifest.exists():
+        shutil.copy2(manifest, base_manifest)
     lj_rows = [(path.relative_to(args.data).as_posix(), "real", f"real:{path.name.split('-')[0]}")
                for path in lj_files]
     libri_rows = add_librispeech(args.archive, args.data, args.per_speaker)
@@ -104,7 +110,6 @@ def main() -> None:
                     break
         if not advanced:
             break
-    manifest = args.data / "train.csv"
     with manifest.open("w", newline="", encoding="utf-8") as stream:
         writer = csv.writer(stream)
         writer.writerow(("filename", "label", "group"))

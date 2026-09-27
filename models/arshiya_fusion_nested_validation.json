@@ -1,0 +1,209 @@
+{
+  "dataset_samples": 726,
+  "real": 242,
+  "synthetic": 484,
+  "group_count": 60,
+  "metric": "normalized minDCF; Pspoof=.3, Cmiss=1, Cfa=4",
+  "outer_validation": "5-fold StratifiedGroupKFold",
+  "inner_weight_selection": "4-fold StratifiedGroupKFold, grid-only minDCF selection",
+  "out_of_fold_results": {
+    "baseline": {
+      "normalized_minDCF": 0.3707201889020071,
+      "roc_auc": 0.8732668533570112,
+      "average_precision": 0.9444633521737216
+    },
+    "julia_metadata": {
+      "normalized_minDCF": 0.3645218417945691,
+      "roc_auc": 0.8733949183798921,
+      "average_precision": 0.9445605696290735
+    },
+    "temporal": {
+      "normalized_minDCF": 0.45425029515938603,
+      "roc_auc": 0.8291697971450037,
+      "average_precision": 0.9263033068260191
+    },
+    "nested_fusion": {
+      "normalized_minDCF": 0.38577331759149946,
+      "roc_auc": 0.8530923434191654,
+      "average_precision": 0.9364984289194966
+    },
+    "fixed_fusion": {
+      "normalized_minDCF": 0.3497638724911452,
+      "roc_auc": 0.8649170138651732,
+      "average_precision": 0.9429069159593123
+    }
+  },
+  "outer_fold_details": [
+    {
+      "fold": 1,
+      "held_out_groups": [
+        "real:LJ005",
+        "real:LJ006",
+        "real:LJ012",
+        "real:LJ016",
+        "real:LJ017",
+        "real:LJ033",
+        "real:LJ036",
+        "real:LJ043",
+        "real:LJ047",
+        "real:LJ048",
+        "synthetic:diffgan_tts",
+        "synthetic:xtts_v2"
+      ],
+      "selected_temporal_weight": 0.0,
+      "selected_metadata_real_weight": 0.1,
+      "inner_minDCF_at_selected_weights": 0.331879725421116,
+      "outer_nested_fusion": {
+        "normalized_minDCF": 0.32364521655495776,
+        "roc_auc": 0.930780559646539,
+        "average_precision": 0.9655517257175168
+      },
+      "outer_fixed_50_50": {
+        "normalized_minDCF": 0.27835051546391754,
+        "roc_auc": 0.9427729854828529,
+        "average_precision": 0.9719395268021283
+      }
+    },
+    {
+      "fold": 2,
+      "held_out_groups": [
+        "real:LJ007",
+        "real:LJ009",
+        "real:LJ015",
+        "real:LJ018",
+        "real:LJ026",
+        "real:LJ029",
+        "real:LJ031",
+        "real:LJ035",
+        "real:LJ044",
+        "real:LJ049",
+        "synthetic:openvoicev2",
+        "synthetic:playht"
+      ],
+      "selected_temporal_weight": 0.5,
+      "selected_metadata_real_weight": 0.025,
+      "inner_minDCF_at_selected_weights": 0.39066477697638075,
+      "outer_nested_fusion": {
+        "normalized_minDCF": 0.08028012383156503,
+        "roc_auc": 0.9962129181569535,
+        "average_precision": 0.9980806332393407
+      },
+      "outer_fixed_50_50": {
+        "normalized_minDCF": 0.08028012383156503,
+        "roc_auc": 0.9964233115926783,
+        "average_precision": 0.9981951807765687
+      }
+    },
+    {
+      "fold": 3,
+      "held_out_groups": [
+        "real:LJ002",
+        "real:LJ003",
+        "real:LJ019",
+        "real:LJ023",
+        "real:LJ030",
+        "real:LJ032",
+        "real:LJ037",
+        "real:LJ039",
+        "real:LJ040",
+        "real:LJ045",
+        "synthetic:elevenlabs",
+        "synthetic:unit_speech"
+      ],
+      "selected_temporal_weight": 0.5,
+      "selected_metadata_real_weight": 0.05,
+      "inner_minDCF_at_selected_weights": 0.35993804538518037,
+      "outer_nested_fusion": {
+        "normalized_minDCF": 0.05154639175257732,
+        "roc_auc": 0.9972079037800687,
+        "average_precision": 0.998658702694158
+      },
+      "outer_fixed_50_50": {
+        "normalized_minDCF": 0.05154639175257732,
+        "roc_auc": 0.9972079037800687,
+        "average_precision": 0.998658702694158
+      }
+    },
+    {
+      "fold": 4,
+      "held_out_groups": [
+        "real:LJ004",
+        "real:LJ008",
+        "real:LJ010",
+        "real:LJ011",
+        "real:LJ014",
+        "real:LJ021",
+        "real:LJ022",
+        "real:LJ024",
+        "real:LJ025",
+        "real:LJ046",
+        "synthetic:grad_tts",
+        "synthetic:pro_diff"
+      ],
+      "selected_temporal_weight": 0.0,
+      "selected_metadata_real_weight": 0.075,
+      "inner_minDCF_at_selected_weights": 0.27648578811369506,
+      "outer_nested_fusion": {
+        "normalized_minDCF": 0.7566273932253315,
+        "roc_auc": 0.7152061855670102,
+        "average_precision": 0.8386685625975192
+      },
+      "outer_fixed_50_50": {
+        "normalized_minDCF": 0.7091310751104566,
+        "roc_auc": 0.6868556701030927,
+        "average_precision": 0.826249214844959
+      }
+    },
+    {
+      "fold": 5,
+      "held_out_groups": [
+        "real:LJ001",
+        "real:LJ013",
+        "real:LJ020",
+        "real:LJ027",
+        "real:LJ028",
+        "real:LJ034",
+        "real:LJ038",
+        "real:LJ041",
+        "real:LJ042",
+        "real:LJ050",
+        "synthetic:wavegrad2",
+        "synthetic:your_tts"
+      ],
+      "selected_temporal_weight": 0.0,
+      "selected_metadata_real_weight": 0.075,
+      "inner_minDCF_at_selected_weights": 0.3560382916053019,
+      "outer_nested_fusion": {
+        "normalized_minDCF": 0.3645833333333333,
+        "roc_auc": 0.9214409722222222,
+        "average_precision": 0.9596619367981464
+      },
+      "outer_fixed_50_50": {
+        "normalized_minDCF": 0.2604166666666667,
+        "roc_auc": 0.9409722222222222,
+        "average_precision": 0.9720664134954972
+      }
+    }
+  ],
+  "final_policy": {
+    "temporal_weight": 0.5,
+    "metadata_real_weight": 0.05,
+    "selection": "fixed 50/50 audio-temporal blend plus Julia's fixed 5% metadata prior",
+    "reason": "Per-fold nested grid choices were unstable and scored worse on outer folds than the fixed blend.",
+    "nested_selected_temporal_weights": [
+      0.0,
+      0.5,
+      0.5,
+      0.0,
+      0.0
+    ],
+    "nested_selected_metadata_weights": [
+      0.1,
+      0.025,
+      0.05,
+      0.075,
+      0.075
+    ]
+  },
+  "warning": "Validation measures the weight-selection procedure on LJ/DiffSSD. It does not guarantee transfer to the challenge distribution."
+}

@@ -13,38 +13,37 @@ from pathlib import Path
 
 import joblib
 import numpy as np
-from sklearn.metrics import confusion_matrix, roc_auc_score, roc_curve
+from sklearn.metrics import confusion_matrix, roc_auc_score
 from sklearn.model_selection import GroupKFold
 
 from hearsay.features import FEATURE_NAMES
 from hearsay.metadata import adjust_score, analyze_metadata
 from hearsay.model import _fit_ensemble, feature_matrix, fit_optimized, load_model, save_json
+from hearsay.routing import min_dcf
 from hearsay.utils import read_manifest
 
 
 def summarize(labels: np.ndarray, scores: np.ndarray) -> dict:
-    """Report fixed-cutoff accuracy and normalized ASVspoof 5 Track 1 minDCF."""
+    """Report metrics using the Hearsay challenge's prior and error costs."""
     if len(set(labels)) != 2:
         raise ValueError("Evaluation needs both real and synthetic clips")
     matrix = confusion_matrix(labels, scores >= 0.5, labels=[0, 1])
-    # This challenge's score rises for synthetic speech; ASVspoof 5 uses the
-    # opposite polarity, with a 5% spoof prior and costs 1/10 for rejecting
-    # real/accepting spoof. The default normalization is 0.5.
-    false_accept_spoof, true_accept_real, _ = roc_curve(
-        1 - labels, 1 - scores, pos_label=1, drop_intermediate=False)
-    false_reject_real = 1 - true_accept_real
-    normalized_costs = (0.95 * false_reject_real + 0.5 * false_accept_spoof) / 0.5
-    fixed_false_reject_real = matrix[0, 1] / matrix[0].sum()
-    fixed_false_accept_spoof = matrix[1, 0] / matrix[1].sum()
+    # Labels are 0=real, 1=synthetic and larger scores mean more synthetic.
+    # The challenge uses Pspoof=.3, Cmiss=1, Cfa=4 and normalizes by .7.
+    fixed_miss = matrix[1, 0] / matrix[1].sum()
+    fixed_false_alarm = matrix[0, 1] / matrix[0].sum()
+    fixed_dcf = (0.7 * fixed_miss + 1.2 * fixed_false_alarm) / 0.7
+    challenge_min_dcf, min_dcf_threshold = min_dcf(labels, scores)
     return {
         "samples": len(labels),
         "real": int(sum(labels == 0)),
         "synthetic": int(sum(labels == 1)),
         "accuracy_at_0.5": float(np.trace(matrix) / len(labels)),
         "roc_auc": float(roc_auc_score(labels, scores)),
-        "min_dcf": float(np.min(normalized_costs)),
-        "dcf_at_0.5": float((0.95 * fixed_false_reject_real +
-                            0.5 * fixed_false_accept_spoof) / 0.5),
+        "min_dcf": challenge_min_dcf,
+        "min_dcf_threshold": min_dcf_threshold,
+        "dcf_at_0.5": float(fixed_dcf),
+        "min_dcf_config": {"p_spoof": 0.3, "c_miss": 1.0, "c_fa": 4.0},
         "confusion_matrix_real_synthetic": matrix.tolist(),
     }
 
@@ -145,7 +144,7 @@ def main() -> None:
                 for status in ("consistent", "inconsistent", "unknown")
             },
         },
-        "min_dcf_definition": "ASVspoof 5 Track 1: (0.95 * false_reject_real + 0.5 * false_accept_spoof) / 0.5, minimized over score thresholds",
+        "min_dcf_definition": "Hearsay: (0.7 * miss + 1.2 * false_alarm) / 0.7, minimized over score thresholds (Pspoof=0.3, Cmiss=1, Cfa=4)",
         "caveat": "The test set holds out only PlayHT and Pro Diff generator families. All training metadata is consistent, while all held-out PlayHT containers are inconsistent. Shared synthetic speaker IDs and the LJ narrator limit generalization claims.",
     }
     args.model.parent.mkdir(parents=True, exist_ok=True)

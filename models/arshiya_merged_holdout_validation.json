@@ -1,0 +1,105 @@
+{
+  "validation_source": "group list from Julia's committed optimized-comparison.json",
+  "labels_source": "data/train.csv",
+  "training_examples": 577,
+  "heldout_examples_available_locally": 149,
+  "heldout_class_counts": {
+    "real": 53,
+    "synthetic": 96
+  },
+  "expected_groups": [
+    "real:LJ004",
+    "real:LJ013",
+    "real:LJ017",
+    "real:LJ019",
+    "real:LJ026",
+    "real:LJ030",
+    "real:LJ032",
+    "real:LJ033",
+    "real:LJ039",
+    "real:LJ044",
+    "real:LJ049",
+    "real:libri:2035",
+    "real:libri:3752",
+    "real:libri:5895",
+    "real:libri:777",
+    "real:libri:8297",
+    "synthetic:playht",
+    "synthetic:pro_diff"
+  ],
+  "groups_present_locally": [
+    "real:LJ004",
+    "real:LJ013",
+    "real:LJ017",
+    "real:LJ019",
+    "real:LJ026",
+    "real:LJ030",
+    "real:LJ032",
+    "real:LJ033",
+    "real:LJ039",
+    "real:LJ044",
+    "real:LJ049",
+    "synthetic:playht",
+    "synthetic:pro_diff"
+  ],
+  "groups_missing_locally": [
+    "real:libri:2035",
+    "real:libri:3752",
+    "real:libri:5895",
+    "real:libri:777",
+    "real:libri:8297"
+  ],
+  "metric": "normalized minDCF; Pspoof=.3, Cmiss=1, Cfa=4",
+  "results": {
+    "julia_saved_optimized": {
+      "normalized_minDCF": 0.11458333333333333,
+      "minDCF_threshold": 0.48072968155986273,
+      "roc_auc": 0.9909591194968554,
+      "average_precision": 0.9951527037399702
+    },
+    "julia_saved_forest": {
+      "normalized_minDCF": 0.36896338724168914,
+      "minDCF_threshold": 0.5076706167436819,
+      "roc_auc": 0.9266902515723271,
+      "average_precision": 0.9431674479853671
+    },
+    "local_julia_forest_baseline": {
+      "normalized_minDCF": 0.3618317610062893,
+      "minDCF_threshold": 0.5321663102052958,
+      "roc_auc": 0.9394654088050315,
+      "average_precision": 0.9629747130076389
+    },
+    "local_julia_optimized_baseline": {
+      "normalized_minDCF": 0.10416666666666669,
+      "minDCF_threshold": 0.585721053369175,
+      "roc_auc": 0.9919418238993711,
+      "average_precision": 0.9956397971073213
+    },
+    "local_julia_optimized_plus_lfcc": {
+      "normalized_minDCF": 0.0,
+      "minDCF_threshold": 0.5719504737464256,
+      "roc_auc": 1.0,
+      "average_precision": 0.9999999999999998
+    },
+    "local_julia_optimized_commonband_plus_lfcc": {
+      "normalized_minDCF": 0.0,
+      "minDCF_threshold": 0.6104028057678886,
+      "roc_auc": 1.0,
+      "average_precision": 0.9999999999999998
+    },
+    "local_extra_trees_plus_lfcc": {
+      "normalized_minDCF": 0.0,
+      "minDCF_threshold": 0.48791389554982256,
+      "roc_auc": 1.0,
+      "average_precision": 0.9999999999999998
+    },
+    "local_extra_trees_commonband_plus_lfcc": {
+      "normalized_minDCF": 0.010416666666666666,
+      "minDCF_threshold": 0.47961532854666,
+      "roc_auc": 0.9996069182389937,
+      "average_precision": 0.9997874149659862
+    }
+  },
+  "caveat": "Only the local LJ/DiffSSD rows matching Julia's recorded holdout groups are scored; five LibriSpeech groups are absent locally. Do not interpret this partial holdout as the full 293-clip report. Model selection using these labels can overfit this comparison.",
+  "historical_snapshot_note": "This report was generated before OpenSLR Mini LibriSpeech was added to the local corpus. Its five missing LibriSpeech holdout groups now exist locally, but this report was not rerun because its labels were already used in grouped OOF candidate comparisons."
+}
