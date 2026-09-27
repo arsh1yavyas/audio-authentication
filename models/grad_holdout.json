@@ -1,0 +1,57 @@
+{
+  "0.0": {
+    "mean_auc": 0.7158,
+    "worst_auc": 0.629,
+    "by_generator": {
+      "42:synthetic:grad_tts": 0.7389,
+      "43:synthetic:grad_tts": 0.6845,
+      "44:synthetic:grad_tts": 0.629,
+      "45:synthetic:grad_tts": 0.7268,
+      "46:synthetic:grad_tts": 0.7997
+    }
+  },
+  "0.25": {
+    "mean_auc": 0.711,
+    "worst_auc": 0.6061,
+    "by_generator": {
+      "42:synthetic:grad_tts": 0.7345,
+      "43:synthetic:grad_tts": 0.6698,
+      "44:synthetic:grad_tts": 0.6061,
+      "45:synthetic:grad_tts": 0.7395,
+      "46:synthetic:grad_tts": 0.8053
+    }
+  },
+  "0.5": {
+    "mean_auc": 0.695,
+    "worst_auc": 0.571,
+    "by_generator": {
+      "42:synthetic:grad_tts": 0.7147,
+      "43:synthetic:grad_tts": 0.6431,
+      "44:synthetic:grad_tts": 0.571,
+      "45:synthetic:grad_tts": 0.7435,
+      "46:synthetic:grad_tts": 0.8026
+    }
+  },
+  "0.75": {
+    "mean_auc": 0.656,
+    "worst_auc": 0.5247,
+    "by_generator": {
+      "42:synthetic:grad_tts": 0.6673,
+      "43:synthetic:grad_tts": 0.586,
+      "44:synthetic:grad_tts": 0.5247,
+      "45:synthetic:grad_tts": 0.7318,
+      "46:synthetic:grad_tts": 0.7702
+    }
+  },
+  "1.0": {
+    "mean_auc": 0.5982,
+    "worst_auc": 0.4725,
+    "by_generator": {
+      "42:synthetic:grad_tts": 0.5993,
+      "43:synthetic:grad_tts": 0.5157,
+      "44:synthetic:grad_tts": 0.4725,
+      "45:synthetic:grad_tts": 0.6975,
+      "46:synthetic:grad_tts": 0.7058
+    }
+  }
+}

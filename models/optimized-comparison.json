@@ -1,0 +1,206 @@
+{
+  "model": "75% standardized RBF SVM (C=1) plus 25% standardized logistic regression (C=0.1)",
+  "seed": 42,
+  "training_samples": 1167,
+  "training_manifest_sha256": "c77d1cd5b49304fa02164cf6c355afcd2dd4683d22c3750a415345ab0282f87a",
+  "selection_on_training_only": {
+    "method": "one held-out synthetic generator per fold; disjoint real groups via GroupKFold",
+    "folds": 8,
+    "original": {
+      "samples": 1167,
+      "real": 583,
+      "synthetic": 584,
+      "accuracy_at_0.5": 0.7463581833761782,
+      "roc_auc": 0.8103661975140394,
+      "min_dcf": 0.6006996170022793,
+      "dcf_at_0.5": 0.6197566907117178,
+      "confusion_matrix_real_synthetic": [
+        [
+          510,
+          73
+        ],
+        [
+          223,
+          361
+        ]
+      ]
+    },
+    "optimized": {
+      "samples": 1167,
+      "real": 583,
+      "synthetic": 584,
+      "accuracy_at_0.5": 0.8508997429305912,
+      "roc_auc": 0.9109794638031907,
+      "min_dcf": 0.34865422119880646,
+      "dcf_at_0.5": 0.35671890786907584,
+      "confusion_matrix_real_synthetic": [
+        [
+          545,
+          38
+        ],
+        [
+          136,
+          448
+        ]
+      ]
+    },
+    "by_generator": [
+      {
+        "held_out_generator": "synthetic:diffgan_tts",
+        "samples": 146,
+        "original_accuracy_at_0.5": 0.684931506849315,
+        "optimized_accuracy_at_0.5": 0.952054794520548
+      },
+      {
+        "held_out_generator": "synthetic:elevenlabs",
+        "samples": 146,
+        "original_accuracy_at_0.5": 0.678082191780822,
+        "optimized_accuracy_at_0.5": 0.8082191780821918
+      },
+      {
+        "held_out_generator": "synthetic:grad_tts",
+        "samples": 146,
+        "original_accuracy_at_0.5": 0.4726027397260274,
+        "optimized_accuracy_at_0.5": 0.4315068493150685
+      },
+      {
+        "held_out_generator": "synthetic:openvoicev2",
+        "samples": 146,
+        "original_accuracy_at_0.5": 0.7465753424657534,
+        "optimized_accuracy_at_0.5": 0.952054794520548
+      },
+      {
+        "held_out_generator": "synthetic:unit_speech",
+        "samples": 146,
+        "original_accuracy_at_0.5": 0.821917808219178,
+        "optimized_accuracy_at_0.5": 0.8904109589041096
+      },
+      {
+        "held_out_generator": "synthetic:wavegrad2",
+        "samples": 145,
+        "original_accuracy_at_0.5": 0.7103448275862069,
+        "optimized_accuracy_at_0.5": 0.8482758620689655
+      },
+      {
+        "held_out_generator": "synthetic:xtts_v2",
+        "samples": 146,
+        "original_accuracy_at_0.5": 0.9452054794520548,
+        "optimized_accuracy_at_0.5": 0.9794520547945206
+      },
+      {
+        "held_out_generator": "synthetic:your_tts",
+        "samples": 146,
+        "original_accuracy_at_0.5": 0.910958904109589,
+        "optimized_accuracy_at_0.5": 0.9452054794520548
+      }
+    ]
+  },
+  "held_out_test": {
+    "method": "provided test manifest, no fitting or model selection",
+    "test_groups": [
+      "real:LJ004",
+      "real:LJ013",
+      "real:LJ017",
+      "real:LJ019",
+      "real:LJ026",
+      "real:LJ030",
+      "real:LJ032",
+      "real:LJ033",
+      "real:LJ039",
+      "real:LJ044",
+      "real:LJ049",
+      "real:libri:2035",
+      "real:libri:3752",
+      "real:libri:5895",
+      "real:libri:777",
+      "real:libri:8297",
+      "synthetic:playht",
+      "synthetic:pro_diff"
+    ],
+    "original": {
+      "samples": 293,
+      "real": 147,
+      "synthetic": 146,
+      "accuracy_at_0.5": 0.8873720136518771,
+      "roc_auc": 0.9481874941757524,
+      "min_dcf": 0.2928618022551486,
+      "dcf_at_0.5": 0.31716522225328486,
+      "confusion_matrix_real_synthetic": [
+        [
+          132,
+          15
+        ],
+        [
+          18,
+          128
+        ]
+      ]
+    },
+    "optimized": {
+      "samples": 293,
+      "real": 147,
+      "synthetic": 146,
+      "accuracy_at_0.5": 0.9453924914675768,
+      "roc_auc": 0.9930109029913335,
+      "min_dcf": 0.10881558102693133,
+      "dcf_at_0.5": 0.12781660609449258,
+      "confusion_matrix_real_synthetic": [
+        [
+          144,
+          3
+        ],
+        [
+          13,
+          133
+        ]
+      ]
+    },
+    "audio_only": {
+      "original": {
+        "samples": 293,
+        "real": 147,
+        "synthetic": 146,
+        "accuracy_at_0.5": 0.8703071672354948,
+        "roc_auc": 0.9428291864691082,
+        "min_dcf": 0.2928618022551486,
+        "dcf_at_0.5": 0.40001863759202305,
+        "confusion_matrix_real_synthetic": [
+          [
+            124,
+            23
+          ],
+          [
+            15,
+            131
+          ]
+        ]
+      },
+      "optimized": {
+        "samples": 293,
+        "real": 147,
+        "synthetic": 146,
+        "accuracy_at_0.5": 0.9453924914675768,
+        "roc_auc": 0.992498369210698,
+        "min_dcf": 0.10881558102693133,
+        "dcf_at_0.5": 0.13389246109402664,
+        "confusion_matrix_real_synthetic": [
+          [
+            143,
+            4
+          ],
+          [
+            12,
+            134
+          ]
+        ]
+      }
+    },
+    "metadata_status_counts": {
+      "consistent": 220,
+      "inconsistent": 73,
+      "unknown": 0
+    }
+  },
+  "min_dcf_definition": "ASVspoof 5 Track 1: (0.95 * false_reject_real + 0.5 * false_accept_spoof) / 0.5, minimized over score thresholds",
+  "caveat": "The test set holds out only PlayHT and Pro Diff generator families. All training metadata is consistent, while all held-out PlayHT containers are inconsistent. Shared synthetic speaker IDs and the LJ narrator limit generalization claims."
+}

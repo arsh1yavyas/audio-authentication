@@ -1,0 +1,82 @@
+{
+  "0.0": {
+    "mean_auc": 0.8522,
+    "worst_auc": 0.7264,
+    "by_generator": {
+      "synthetic:diffgan_tts": 0.7894,
+      "synthetic:elevenlabs": 0.7264,
+      "synthetic:grad_tts": 0.7389,
+      "synthetic:openvoicev2": 0.8061,
+      "synthetic:playht": 0.9037,
+      "synthetic:pro_diff": 0.9357,
+      "synthetic:unit_speech": 0.9375,
+      "synthetic:wavegrad2": 0.795,
+      "synthetic:xtts_v2": 0.9673,
+      "synthetic:your_tts": 0.9223
+    }
+  },
+  "0.25": {
+    "mean_auc": 0.8866,
+    "worst_auc": 0.7345,
+    "by_generator": {
+      "synthetic:diffgan_tts": 0.8317,
+      "synthetic:elevenlabs": 0.8005,
+      "synthetic:grad_tts": 0.7345,
+      "synthetic:openvoicev2": 0.8488,
+      "synthetic:playht": 0.9401,
+      "synthetic:pro_diff": 0.9683,
+      "synthetic:unit_speech": 0.9628,
+      "synthetic:wavegrad2": 0.8338,
+      "synthetic:xtts_v2": 0.9821,
+      "synthetic:your_tts": 0.9636
+    }
+  },
+  "0.5": {
+    "mean_auc": 0.914,
+    "worst_auc": 0.7147,
+    "by_generator": {
+      "synthetic:diffgan_tts": 0.8827,
+      "synthetic:elevenlabs": 0.8833,
+      "synthetic:grad_tts": 0.7147,
+      "synthetic:openvoicev2": 0.8907,
+      "synthetic:playht": 0.9654,
+      "synthetic:pro_diff": 0.9837,
+      "synthetic:unit_speech": 0.9772,
+      "synthetic:wavegrad2": 0.8689,
+      "synthetic:xtts_v2": 0.9874,
+      "synthetic:your_tts": 0.9856
+    }
+  },
+  "0.75": {
+    "mean_auc": 0.9274,
+    "worst_auc": 0.6673,
+    "by_generator": {
+      "synthetic:diffgan_tts": 0.9295,
+      "synthetic:elevenlabs": 0.9441,
+      "synthetic:grad_tts": 0.6673,
+      "synthetic:openvoicev2": 0.9209,
+      "synthetic:playht": 0.975,
+      "synthetic:pro_diff": 0.9831,
+      "synthetic:unit_speech": 0.9855,
+      "synthetic:wavegrad2": 0.8903,
+      "synthetic:xtts_v2": 0.9886,
+      "synthetic:your_tts": 0.9896
+    }
+  },
+  "1.0": {
+    "mean_auc": 0.9211,
+    "worst_auc": 0.5993,
+    "by_generator": {
+      "synthetic:diffgan_tts": 0.9353,
+      "synthetic:elevenlabs": 0.9671,
+      "synthetic:grad_tts": 0.5993,
+      "synthetic:openvoicev2": 0.9333,
+      "synthetic:playht": 0.9694,
+      "synthetic:pro_diff": 0.9671,
+      "synthetic:unit_speech": 0.9856,
+      "synthetic:wavegrad2": 0.8869,
+      "synthetic:xtts_v2": 0.9832,
+      "synthetic:your_tts": 0.9841
+    }
+  }
+}
