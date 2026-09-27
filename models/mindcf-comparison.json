@@ -1,0 +1,343 @@
+{
+  "objective": "normalized minDCF with 70% real, 30% spoof, costs 4 for rejecting real and 1 for accepting spoof",
+  "model": "standardized RBF SVM, C=1, gamma=scale, balanced class weights",
+  "training_samples": 1167,
+  "feature_source": {
+    "method": "existing cache with unchanged audio and five exact row checks",
+    "cache": "data\\split\\split_features.npz",
+    "checked_rows": [
+      0,
+      364,
+      729,
+      1094,
+      1459
+    ],
+    "limitation": "The remaining rows were not recomputed in this run"
+  },
+  "training_manifest_sha256": "c77d1cd5b49304fa02164cf6c355afcd2dd4683d22c3750a415345ab0282f87a",
+  "selection_on_training_only": {
+    "method": "eight held-out synthetic generators paired with disjoint real groups in each of three balanced partitions",
+    "partitions": [
+      {
+        "partition": 0,
+        "current": {
+          "samples": 1167,
+          "real": 583,
+          "synthetic": 584,
+          "accuracy_at_0.5": 0.8508997429305912,
+          "roc_auc": 0.9109794638031907,
+          "min_dcf": 0.5801279791975061,
+          "min_dcf_threshold": 0.827117308124141,
+          "dcf_at_0.5": 0.8412243395443189,
+          "min_dcf_config": {
+            "p_spoof": 0.3,
+            "c_miss": 1.0,
+            "c_fa": 4.0
+          },
+          "confusion_matrix_real_synthetic": [
+            [
+              545,
+              38
+            ],
+            [
+              136,
+              448
+            ]
+          ]
+        },
+        "candidate": {
+          "samples": 1167,
+          "real": 583,
+          "synthetic": 584,
+          "accuracy_at_0.5": 0.8474721508140531,
+          "roc_auc": 0.8931321812072651,
+          "min_dcf": 0.5430549355013041,
+          "min_dcf_threshold": 0.8264983314244692,
+          "dcf_at_0.5": 0.9338545705177909,
+          "min_dcf_config": {
+            "p_spoof": 0.3,
+            "c_miss": 1.0,
+            "c_fa": 4.0
+          },
+          "confusion_matrix_real_synthetic": [
+            [
+              539,
+              44
+            ],
+            [
+              134,
+              450
+            ]
+          ]
+        },
+        "current_min_dcf_cutoff": 0.827117308124141,
+        "candidate_min_dcf_cutoff": 0.8264983314244692,
+        "direct_cost_check": {
+          "current": 0.5801279791975061,
+          "candidate": 0.5430549355013041
+        }
+      },
+      {
+        "partition": 1,
+        "current": {
+          "samples": 1167,
+          "real": 583,
+          "synthetic": 584,
+          "accuracy_at_0.5": 0.8663239074550129,
+          "roc_auc": 0.9299736835921897,
+          "min_dcf": 0.42824666932963645,
+          "min_dcf_threshold": 0.7423424017969918,
+          "dcf_at_0.5": 0.7103246865136241,
+          "min_dcf_config": {
+            "p_spoof": 0.3,
+            "c_miss": 1.0,
+            "c_fa": 4.0
+          },
+          "confusion_matrix_real_synthetic": [
+            [
+              552,
+              31
+            ],
+            [
+              125,
+              459
+            ]
+          ]
+        },
+        "candidate": {
+          "samples": 1167,
+          "real": 583,
+          "synthetic": 584,
+          "accuracy_at_0.5": 0.8680377035132819,
+          "roc_auc": 0.9153909866303249,
+          "min_dcf": 0.4002512198751537,
+          "min_dcf_threshold": 0.8056525629450634,
+          "dcf_at_0.5": 0.7211968482968741,
+          "min_dcf_config": {
+            "p_spoof": 0.3,
+            "c_miss": 1.0,
+            "c_fa": 4.0
+          },
+          "confusion_matrix_real_synthetic": [
+            [
+              551,
+              32
+            ],
+            [
+              122,
+              462
+            ]
+          ]
+        },
+        "current_min_dcf_cutoff": 0.7423424017969918,
+        "candidate_min_dcf_cutoff": 0.8056525629450634,
+        "direct_cost_check": {
+          "current": 0.42824666932963645,
+          "candidate": 0.4002512198751537
+        }
+      },
+      {
+        "partition": 2,
+        "current": {
+          "samples": 1167,
+          "real": 583,
+          "synthetic": 584,
+          "accuracy_at_0.5": 0.8586118251928021,
+          "roc_auc": 0.9260174111233818,
+          "min_dcf": 0.4791005819372322,
+          "min_dcf_threshold": 0.7538571935625913,
+          "dcf_at_0.5": 0.7972197420052163,
+          "min_dcf_config": {
+            "p_spoof": 0.3,
+            "c_miss": 1.0,
+            "c_fa": 4.0
+          },
+          "confusion_matrix_real_synthetic": [
+            [
+              547,
+              36
+            ],
+            [
+              129,
+              455
+            ]
+          ]
+        },
+        "candidate": {
+          "samples": 1167,
+          "real": 583,
+          "synthetic": 584,
+          "accuracy_at_0.5": 0.8628963153384748,
+          "roc_auc": 0.910497779553091,
+          "min_dcf": 0.448794614535116,
+          "min_dcf_threshold": 0.816322567562803,
+          "dcf_at_0.5": 0.7886580981695999,
+          "min_dcf_config": {
+            "p_spoof": 0.3,
+            "c_miss": 1.0,
+            "c_fa": 4.0
+          },
+          "confusion_matrix_real_synthetic": [
+            [
+              547,
+              36
+            ],
+            [
+              124,
+              460
+            ]
+          ]
+        },
+        "current_min_dcf_cutoff": 0.7538571935625913,
+        "candidate_min_dcf_cutoff": 0.816322567562803,
+        "direct_cost_check": {
+          "current": 0.4791005819372322,
+          "candidate": 0.448794614535116
+        }
+      }
+    ],
+    "candidate_improved_all_partitions": true,
+    "operating_cutoff_method": "median of three training-only group-disjoint OOF minDCF cutoffs",
+    "selected_operating_cutoffs": {
+      "current": 0.7538571935625913,
+      "candidate": 0.816322567562803
+    }
+  },
+  "held_out_test": {
+    "status": "exploratory; this holdout was examined in earlier model work",
+    "test_groups": [
+      "real:LJ004",
+      "real:LJ013",
+      "real:LJ017",
+      "real:LJ019",
+      "real:LJ026",
+      "real:LJ030",
+      "real:LJ032",
+      "real:LJ033",
+      "real:LJ039",
+      "real:LJ044",
+      "real:LJ049",
+      "real:libri:2035",
+      "real:libri:3752",
+      "real:libri:5895",
+      "real:libri:777",
+      "real:libri:8297",
+      "synthetic:playht",
+      "synthetic:pro_diff"
+    ],
+    "current": {
+      "samples": 293,
+      "real": 147,
+      "synthetic": 146,
+      "accuracy_at_0.5": 0.9453924914675768,
+      "roc_auc": 0.9930109029913335,
+      "min_dcf": 0.13013698630136986,
+      "min_dcf_threshold": 0.6881226740267499,
+      "dcf_at_0.5": 0.27951728636660145,
+      "min_dcf_config": {
+        "p_spoof": 0.3,
+        "c_miss": 1.0,
+        "c_fa": 4.0
+      },
+      "confusion_matrix_real_synthetic": [
+        [
+          144,
+          3
+        ],
+        [
+          13,
+          133
+        ]
+      ]
+    },
+    "candidate": {
+      "samples": 293,
+      "real": 147,
+      "synthetic": 146,
+      "accuracy_at_0.5": 0.9419795221843004,
+      "roc_auc": 0.9911937377690803,
+      "min_dcf": 0.136986301369863,
+      "min_dcf_threshold": 0.6995271831070877,
+      "dcf_at_0.5": 0.34300934985866494,
+      "min_dcf_config": {
+        "p_spoof": 0.3,
+        "c_miss": 1.0,
+        "c_fa": 4.0
+      },
+      "confusion_matrix_real_synthetic": [
+        [
+          143,
+          4
+        ],
+        [
+          13,
+          133
+        ]
+      ]
+    },
+    "dcf_at_training_selected_cutoff": {
+      "current": 0.21232876712328763,
+      "candidate": 0.2191780821917808
+    },
+    "audio_only": {
+      "current": {
+        "samples": 293,
+        "real": 147,
+        "synthetic": 146,
+        "accuracy_at_0.5": 0.9453924914675768,
+        "roc_auc": 0.992498369210698,
+        "min_dcf": 0.1506849315068493,
+        "min_dcf_threshold": 0.7300996243159199,
+        "dcf_at_0.5": 0.33616003479017176,
+        "min_dcf_config": {
+          "p_spoof": 0.3,
+          "c_miss": 1.0,
+          "c_fa": 4.0
+        },
+        "confusion_matrix_real_synthetic": [
+          [
+            143,
+            4
+          ],
+          [
+            12,
+            134
+          ]
+        ]
+      },
+      "candidate": {
+        "samples": 293,
+        "real": 147,
+        "synthetic": 146,
+        "accuracy_at_0.5": 0.9385665529010239,
+        "roc_auc": 0.9909607678687914,
+        "min_dcf": 0.14383561643835616,
+        "min_dcf_threshold": 0.7503127638973028,
+        "dcf_at_0.5": 0.4065014133507285,
+        "min_dcf_config": {
+          "p_spoof": 0.3,
+          "c_miss": 1.0,
+          "c_fa": 4.0
+        },
+        "confusion_matrix_real_synthetic": [
+          [
+            142,
+            5
+          ],
+          [
+            13,
+            133
+          ]
+        ]
+      }
+    }
+  },
+  "cost_assumptions": {
+    "real_prior": 0.7,
+    "spoof_prior": 0.3,
+    "reject_real_cost": 4,
+    "accept_spoof_cost": 1,
+    "normalization": 0.3
+  },
+  "caveat": "The labeled holdout has only PlayHT and Pro Diff as unseen generator families; LJ chapters share a narrator, some synthetic speaker IDs recur, and PlayHT metadata is inconsistent."
+}

@@ -111,8 +111,8 @@ def main() -> None:
         out_of_fold[names[4]][valid_idx] = _apply_metadata(
             lowpass_extra.predict_proba(commonband[valid_idx])[:, 1],
             [files[index] for index in valid_idx])
-        real_cost_per_clip = 4.0 * 0.3 / int(np.sum(labels[train_idx] == 0))
-        synthetic_cost_per_clip = 1.0 * 0.7 / int(np.sum(labels[train_idx] == 1))
+        real_cost_per_clip = 4.0 * 0.7 / int(np.sum(labels[train_idx] == 0))
+        synthetic_cost_per_clip = 1.0 * 0.3 / int(np.sum(labels[train_idx] == 1))
         cost_weighted = _extra_trees(seed, class_weight={
             0: real_cost_per_clip / synthetic_cost_per_clip, 1: 1.0,
         }).fit(commonband[train_idx], labels[train_idx])
@@ -157,8 +157,8 @@ def main() -> None:
         "lowpass_hz": args.lowpass_hz,
         "metadata_real_weight": METADATA_REAL_WEIGHT,
     }
-    real_cost_per_clip = 4.0 * 0.3 / int(np.sum(labels == 0))
-    synthetic_cost_per_clip = 1.0 * 0.7 / int(np.sum(labels == 1))
+    real_cost_per_clip = 4.0 * 0.7 / int(np.sum(labels == 0))
+    synthetic_cost_per_clip = 1.0 * 0.3 / int(np.sum(labels == 1))
     cost_weighted_bundle = {
         "model": _extra_trees(52_003, class_weight={
             0: real_cost_per_clip / synthetic_cost_per_clip, 1: 1.0,

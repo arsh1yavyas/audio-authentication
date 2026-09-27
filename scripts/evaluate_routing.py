@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import math
 import sys
 from pathlib import Path
 
@@ -26,20 +27,41 @@ from hearsay.routing import fit_router, fit_router_from_clusters, min_dcf
 def read_rows(path: Path, primary_column: str, secondary_column: str):
     delimiter = "\t" if path.suffix.lower() == ".tsv" else ","
     with path.open("r", newline="", encoding="utf-8-sig") as stream:
-        rows = list(csv.DictReader(stream, delimiter=delimiter))
+        reader = csv.DictReader(stream, delimiter=delimiter)
+        columns = set(reader.fieldnames or ())
+        rows = list(reader)
     required = {"filename", "label", "group", primary_column, secondary_column}
-    if not rows or not required.issubset(rows[0]):
+    if not rows or not required.issubset(columns):
         raise ValueError(f"Score file must contain: {', '.join(sorted(required))}")
     labels = []
-    for row in rows:
-        tag = row["label"].strip().lower()
+    files = []
+    seen_files = set()
+    for line_number, row in enumerate(rows, start=2):
+        filename = (row["filename"] or "").strip()
+        group = (row["group"] or "").strip()
+        tag = (row["label"] or "").strip().lower()
+        if not filename or not group:
+            raise ValueError(f"Missing filename or group on line {line_number}")
+        row["filename"] = filename
+        row["group"] = group
         if tag in {"0", "real", "bonafide", "bona fide"}:
             labels.append(0)
         elif tag in {"1", "synthetic", "spoof", "fake"}:
             labels.append(1)
         else:
-            raise ValueError(f"Unrecognized label: {tag}")
-    files = [(path.parent / row["filename"]).resolve() for row in rows]
+            raise ValueError(f"Unrecognized label on line {line_number}: {tag}")
+        for column in (primary_column, secondary_column):
+            try:
+                score = float(row[column])
+            except (TypeError, ValueError) as exc:
+                raise ValueError(f"Invalid {column} on line {line_number}") from exc
+            if not math.isfinite(score) or not 0.0 <= score <= 1.0:
+                raise ValueError(f"{column} must be finite and within [0, 1] on line {line_number}")
+        file = (path.parent / filename).resolve()
+        if file in seen_files:
+            raise ValueError(f"Duplicate filename on line {line_number}: {filename}")
+        files.append(file)
+        seen_files.add(file)
     if any(not p.is_file() for p in files):
         raise FileNotFoundError("A filename in score file does not exist relative to that file")
     return rows, files, np.asarray(labels, dtype=np.int8)

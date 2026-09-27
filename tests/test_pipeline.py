@@ -48,8 +48,12 @@ class PipelineTest(unittest.TestCase):
         scores = np.asarray([0.1, 0.4, 0.6, 0.2, 0.7, 0.9])
         report = summarize_optimized(labels, scores)
         expected, threshold = min_dcf(labels, scores, p_spoof=0.3, c_miss=1.0, c_fa=4.0)
+        self.assertAlmostEqual(expected, 1.0 / 3.0)
+        self.assertEqual(threshold, 0.7)
         self.assertAlmostEqual(report["min_dcf"], expected)
         self.assertEqual(report["min_dcf_threshold"], threshold)
+        self.assertAlmostEqual(report["dcf_at_0.5"],
+                               (0.3 * (1.0 / 3.0) + 2.8 * (1.0 / 3.0)) / 0.3)
         self.assertEqual(report["min_dcf_config"],
                          {"p_spoof": 0.3, "c_miss": 1.0, "c_fa": 4.0})
 

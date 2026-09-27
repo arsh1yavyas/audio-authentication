@@ -8,7 +8,6 @@ cluster centroids so the final container can assign routes without Qiskit.
 from __future__ import annotations
 
 import argparse
-import csv
 import json
 import sys
 from pathlib import Path
@@ -22,6 +21,7 @@ from sklearn.preprocessing import StandardScaler
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from hearsay.forensics import extract_quality_features
 from hearsay.routing import fit_router_from_clusters
+from scripts.evaluate_routing import read_rows
 
 
 def main() -> None:
@@ -36,21 +36,19 @@ def main() -> None:
     parser.add_argument("--secondary-column", default="julia_score",
                         help="Can be arshiya_spectral_score for a routing plumbing check")
     args = parser.parse_args()
+    rows, files, labels = read_rows(args.scores, "arshiya_score", args.secondary_column)
+    sample_count = min(args.max_samples, len(files))
+    if sample_count < 2 or not 2 <= args.clusters <= sample_count:
+        raise ValueError("Use at least two samples and between two and the sample count clusters")
     try:
         from qiskit.circuit.library import zz_feature_map
         from qiskit_machine_learning.kernels import FidelityQuantumKernel
     except ImportError as exc:
         raise SystemExit("Install optional dependencies from requirements-quantum.txt") from exc
 
-    delimiter = "\t" if args.scores.suffix.lower() == ".tsv" else ","
-    with args.scores.open("r", newline="", encoding="utf-8-sig") as stream:
-        rows = list(csv.DictReader(stream, delimiter=delimiter))
-    files = [(args.scores.parent / row["filename"]).resolve() for row in rows]
-    if not files or any(not p.is_file() for p in files):
-        raise FileNotFoundError("Score table must reference existing training clips")
     # Deterministic subsampling bounds simulator cost. The labels are not used
     # in quantum feature-map fitting or unsupervised cluster assignments.
-    chosen = np.linspace(0, len(files) - 1, min(args.max_samples, len(files)), dtype=int)
+    chosen = np.linspace(0, len(files) - 1, sample_count, dtype=int)
     quality = np.vstack([extract_quality_features(files[i]) for i in chosen])
     scaler = StandardScaler().fit(quality)
     scaled = scaler.transform(quality)
@@ -61,14 +59,14 @@ def main() -> None:
     gram = kernel.evaluate(x_vec=angles)
     q_labels = SpectralClustering(n_clusters=args.clusters, affinity="precomputed",
                                   assign_labels="kmeans", random_state=42).fit_predict(gram)
+    if len(np.unique(q_labels)) != args.clusters:
+        raise RuntimeError("Quantum clustering produced an empty cluster")
 
     # Store centroids of Q-kernel clusters in ordinary quality-feature space.
     # This approximates the discovered partition at inference, avoiding Qiskit
     # installation and kernel evaluation for every submission audio file.
     centroids = np.vstack([scaled[q_labels == c].mean(axis=0) for c in range(args.clusters)])
     classical = KMeans(n_clusters=args.clusters, n_init=20, random_state=42).fit(scaled)
-    labels = np.asarray([0 if row["label"].strip().lower() in
-                         {"0", "real", "bonafide", "bona fide"} else 1 for row in rows])
     arshiya = np.asarray([float(row["arshiya_score"]) for row in rows])[chosen]
     julia = np.asarray([float(row[args.secondary_column]) for row in rows])[chosen]
     routed = fit_router_from_clusters(quality, labels[chosen], arshiya, julia,

@@ -5,26 +5,28 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import math
 import sys
 from pathlib import Path
 
 import joblib
 import numpy as np
 
-from .features import FEATURE_NAMES, decode_audio, extract_features, lowpass_audio
-from .model import explain, load_model, save_json, train
+from .features import FEATURE_NAMES, SAMPLE_RATE, decode_audio, extract_features, lowpass_audio
 from .forensics import extract_quality_features
+from .lfcc import LFCC_FEATURE_NAMES, extract_lfcc_features
 from .metadata import adjust_score, analyze_metadata
+from .model import explain, load_model, save_json, train
 from .routing import ConditionalRouter
 from .temporal import TEMPORAL_FEATURE_NAMES, extract_temporal_features
-from .lfcc import LFCC_FEATURE_NAMES, extract_lfcc_features
 
 AUDIO_EXTENSIONS = {".wav", ".mp3", ".m4a", ".mp4", ".ogg", ".flac",
                     ".aac", ".wma", ".aif", ".aiff", ".webm", ".opus"}
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="python -m hearsay", description="Random forest audio authenticity baseline")
+    parser = argparse.ArgumentParser(prog="python -m hearsay",
+                                     description="Audio authenticity training and scoring")
     commands = parser.add_subparsers(dest="command", required=True)
 
     training = commands.add_parser("train", help="Train from a labeled CSV or TSV manifest")
@@ -67,7 +69,7 @@ def build_parser() -> argparse.ArgumentParser:
     fused.add_argument("--template", type=Path)
 
     lfcc = commands.add_parser(
-        "predict-lfcc", help="Score with one forest trained on baseline plus LFCC features")
+        "predict-lfcc", help="Score with a saved baseline plus LFCC model")
     lfcc.add_argument("--model", type=Path, required=True)
     lfcc.add_argument("--input", type=Path, required=True)
     lfcc.add_argument("--output", type=Path, required=True)
@@ -89,12 +91,22 @@ def _read_external_scores(path: Path | None, column: str) -> dict[str, float]:
             name = (row.get("filename") or "").strip()
             if not name or name in result:
                 raise ValueError("External score file contains an empty or duplicate filename")
-            result[name] = float(row[score_column])
+            try:
+                score = float(row[score_column])
+            except (TypeError, ValueError) as exc:
+                raise ValueError(f"External score for {name} is not a number") from exc
+            if not math.isfinite(score) or not 0.0 <= score <= 1.0:
+                raise ValueError(f"External score for {name} must be finite and between zero and one")
+            result[name] = score
+        if not result:
+            raise ValueError("External score file contains no scores")
         return result
 
 
 def _input_files(path: Path) -> list[Path]:
     if path.is_file():
+        if path.suffix.lower() not in AUDIO_EXTENSIONS:
+            raise ValueError(f"Unsupported audio file extension: {path}")
         return [path]
     if not path.is_dir():
         raise FileNotFoundError(f"Audio input does not exist: {path}")
@@ -109,23 +121,47 @@ def _input_files(path: Path) -> list[Path]:
     return files
 
 
+def _ordered_input_files(input_path: Path, template_path: Path | None) -> list[Path]:
+    """Find audio and, when requested, preserve the template's exact row order."""
+    files = _input_files(input_path)
+    if template_path is None:
+        return files
+    with template_path.open("r", newline="", encoding="utf-8-sig") as stream:
+        reader = csv.DictReader(stream, delimiter="\t")
+        if not reader.fieldnames or "filename" not in reader.fieldnames:
+            raise ValueError("Template needs a tab-delimited filename column")
+        ordered_names = [(row.get("filename") or "").strip() for row in reader]
+    by_name = {path.name: path for path in files}
+    if len(ordered_names) != len(set(ordered_names)) or set(ordered_names) != set(by_name):
+        raise ValueError("Template filenames must match input audio files exactly once")
+    return [by_name[name] for name in ordered_names]
+
+
+def _write_predictions(output_path: Path, files: list[Path], scores: np.ndarray | list[float]) -> None:
+    """Validate and write the common challenge TSV format."""
+    values = np.asarray(scores, dtype=float)
+    if values.ndim != 1 or len(values) != len(files):
+        raise ValueError("Prediction count must match the number of audio files")
+    if not np.all(np.isfinite(values)) or np.any((values < 0.0) | (values > 1.0)):
+        raise ValueError("Predictions must be finite scores between zero and one")
+    if output_path.resolve() in {path.resolve() for path in files}:
+        raise ValueError("Prediction output cannot overwrite an input audio file")
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open("w", newline="", encoding="utf-8") as stream:
+        writer = csv.writer(stream, delimiter="\t")
+        writer.writerow(("filename", "cm-score"))
+        writer.writerows((path.name, f"{score:.6f}") for path, score in zip(files, values))
+
+
 def generate_predictions(model_path: Path, input_path: Path, output_path: Path,
                          template_path: Path | None = None,
                          explanations_path: Path | None = None) -> int:
     """Score unlabeled audio and write a prediction TSV; return the clip count."""
     model = load_model(model_path)
-    files = _input_files(input_path)
-    if template_path:
-        with template_path.open("r", newline="", encoding="utf-8-sig") as stream:
-            reader = csv.DictReader(stream, delimiter="\t")
-            if not reader.fieldnames or "filename" not in reader.fieldnames:
-                raise ValueError("Template needs a tab-delimited filename column")
-            ordered_names = [(row.get("filename") or "").strip() for row in reader]
-        by_name = {path.name: path for path in files}
-        if (len(ordered_names) != len(set(ordered_names)) or
-                set(ordered_names) != set(by_name)):
-            raise ValueError("Template filenames must match input audio files exactly once")
-        files = [by_name[name] for name in ordered_names]
+    files = _ordered_input_files(input_path, template_path)
+    if explanations_path and explanations_path.resolve() in (
+            {output_path.resolve()} | {path.resolve() for path in files}):
+        raise ValueError("Explanations output cannot overwrite predictions or input audio")
     vectors = []
     metadata = []
     for path in files:
@@ -143,11 +179,7 @@ def generate_predictions(model_path: Path, input_path: Path, output_path: Path,
         audio_scores = model.predict_proba(np.vstack(vectors))[:, 1]
         scores = [adjust_score(score, analysis)
                   for score, analysis in zip(audio_scores, metadata)]
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    with output_path.open("w", newline="", encoding="utf-8") as stream:
-        writer = csv.writer(stream, delimiter="\t")
-        writer.writerow(("filename", "cm-score"))
-        writer.writerows((path.name, f"{score:.6f}") for path, score in zip(files, scores))
+    _write_predictions(output_path, files, scores)
     if explanations_path:
         explanations_path.parent.mkdir(parents=True, exist_ok=True)
         with explanations_path.open("w", encoding="utf-8") as stream:

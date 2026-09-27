@@ -50,15 +50,20 @@ def copy_member(tar: tarfile.TarFile, member: tarfile.TarInfo, destination: Path
     if member.size > MAX_AUDIO_SIZE:
         raise ValueError(f"Unusually large audio file: {member.name}")
     destination.parent.mkdir(parents=True, exist_ok=True)
-    if destination.exists():
-        if destination.stat().st_size != member.size:
-            raise ValueError(f"Existing file differs from archive: {destination}")
-        return
     source = tar.extractfile(member)
     if source is None:
         raise ValueError(f"Cannot read {member.name}")
-    with destination.open("xb") as target:
-        shutil.copyfileobj(source, target)
+    with source:
+        if destination.exists():
+            if destination.stat().st_size != member.size:
+                raise ValueError(f"Existing file differs from archive: {destination}")
+            with destination.open("rb") as existing:
+                while chunk := existing.read(1024 * 1024):
+                    if chunk != source.read(len(chunk)):
+                        raise ValueError(f"Existing file differs from archive: {destination}")
+            return
+        with destination.open("xb") as target:
+            shutil.copyfileobj(source, target)
 
 
 def prepare_real(archive: Path, output: Path) -> list[tuple[str, str, str]]:
@@ -139,6 +144,8 @@ def prepare_synthetic(archive: Path, output: Path, target_count: int,
             break
     rows = [(str(path.relative_to(output.parent)).replace("\\", "/"),
              "synthetic", f"synthetic:{generator}") for generator, path in selected]
+    if len(rows) != len({row[0] for row in rows}):
+        raise ValueError("Duplicate synthetic filenames")
     summary = {"archive_audio_per_generator": dict(counts),
                "selected_per_generator": dict(Counter(gen for gen, _ in selected)),
                "ignored_other_files": ignored}
