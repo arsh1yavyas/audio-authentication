@@ -1,0 +1,366 @@
+{
+  "samples": 726,
+  "real": 242,
+  "synthetic": 484,
+  "groups": 60,
+  "validation": "5-fold StratifiedGroupKFold; random_state=2026",
+  "metric": "normalized minDCF; Pspoof=.3, Cmiss=1, Cfa=4",
+  "feature_dimensions": {
+    "baseline": 84,
+    "lfcc": 120,
+    "combined": 204,
+    "lowpass_combined": 204
+  },
+  "out_of_fold_results": {
+    "baseline": {
+      "normalized_minDCF": 0.3686540731995278,
+      "roc_auc": 0.8715763950549826,
+      "average_precision": 0.9438062312118942
+    },
+    "lfcc_only": {
+      "normalized_minDCF": 0.250590318772137,
+      "roc_auc": 0.9242794208045899,
+      "average_precision": 0.9685858846154758
+    },
+    "baseline_plus_lfcc": {
+      "normalized_minDCF": 0.22166469893742619,
+      "roc_auc": 0.9240659790997883,
+      "average_precision": 0.9698101240295511
+    },
+    "lowpass_baseline": {
+      "normalized_minDCF": 0.30430932703659974,
+      "roc_auc": 0.8921948637388156,
+      "average_precision": 0.9555157630073459
+    },
+    "lowpass_baseline_plus_lfcc": {
+      "normalized_minDCF": 0.19303423848878393,
+      "roc_auc": 0.9203777064408168,
+      "average_precision": 0.9684692042370028
+    }
+  },
+  "fold_details": [
+    {
+      "fold": 1,
+      "held_groups": [
+        "real:LJ005",
+        "real:LJ006",
+        "real:LJ012",
+        "real:LJ016",
+        "real:LJ017",
+        "real:LJ033",
+        "real:LJ036",
+        "real:LJ043",
+        "real:LJ047",
+        "real:LJ048",
+        "synthetic:diffgan_tts",
+        "synthetic:xtts_v2"
+      ],
+      "scores": {
+        "baseline": {
+          "normalized_minDCF": 0.30708424754290525,
+          "roc_auc": 0.9383547233326319,
+          "average_precision": 0.9691393192907936
+        },
+        "lfcc_only": {
+          "normalized_minDCF": 0.0,
+          "roc_auc": 1.0,
+          "average_precision": 1.0
+        },
+        "baseline_plus_lfcc": {
+          "normalized_minDCF": 0.0,
+          "roc_auc": 1.0,
+          "average_precision": 1.0
+        },
+        "lowpass_baseline": {
+          "normalized_minDCF": 0.3461272579724084,
+          "roc_auc": 0.920050494424574,
+          "average_precision": 0.9594292829248373
+        },
+        "lowpass_baseline_plus_lfcc": {
+          "normalized_minDCF": 0.0,
+          "roc_auc": 1.0,
+          "average_precision": 1.0
+        }
+      }
+    },
+    {
+      "fold": 2,
+      "held_groups": [
+        "real:LJ007",
+        "real:LJ009",
+        "real:LJ015",
+        "real:LJ018",
+        "real:LJ026",
+        "real:LJ029",
+        "real:LJ031",
+        "real:LJ035",
+        "real:LJ044",
+        "real:LJ049",
+        "synthetic:openvoicev2",
+        "synthetic:playht"
+      ],
+      "scores": {
+        "baseline": {
+          "normalized_minDCF": 0.041237113402061855,
+          "roc_auc": 0.9983168525142017,
+          "average_precision": 0.9991592470540638
+        },
+        "lfcc_only": {
+          "normalized_minDCF": 0.010309278350515464,
+          "roc_auc": 0.9997896065642752,
+          "average_precision": 0.9998948032821375
+        },
+        "baseline_plus_lfcc": {
+          "normalized_minDCF": 0.0,
+          "roc_auc": 1.0,
+          "average_precision": 1.0
+        },
+        "lowpass_baseline": {
+          "normalized_minDCF": 0.030927835051546393,
+          "roc_auc": 0.9989480328213759,
+          "average_precision": 0.9994739499986186
+        },
+        "lowpass_baseline_plus_lfcc": {
+          "normalized_minDCF": 0.0,
+          "roc_auc": 1.0,
+          "average_precision": 1.0
+        }
+      }
+    },
+    {
+      "fold": 3,
+      "held_groups": [
+        "real:LJ002",
+        "real:LJ003",
+        "real:LJ019",
+        "real:LJ023",
+        "real:LJ030",
+        "real:LJ032",
+        "real:LJ037",
+        "real:LJ039",
+        "real:LJ040",
+        "real:LJ045",
+        "synthetic:elevenlabs",
+        "synthetic:unit_speech"
+      ],
+      "scores": {
+        "baseline": {
+          "normalized_minDCF": 0.010309278350515464,
+          "roc_auc": 0.9995704467353952,
+          "average_precision": 0.9997917317504946
+        },
+        "lfcc_only": {
+          "normalized_minDCF": 0.21575846833578793,
+          "roc_auc": 0.9697164948453608,
+          "average_precision": 0.9842172596241836
+        },
+        "baseline_plus_lfcc": {
+          "normalized_minDCF": 0.0817378497790869,
+          "roc_auc": 0.9926975945017182,
+          "average_precision": 0.9961435949507003
+        },
+        "lowpass_baseline": {
+          "normalized_minDCF": 0.010309278350515464,
+          "roc_auc": 0.9997852233676976,
+          "average_precision": 0.9998948032821375
+        },
+        "lowpass_baseline_plus_lfcc": {
+          "normalized_minDCF": 0.03571428571428571,
+          "roc_auc": 0.9991408934707904,
+          "average_precision": 0.9995726150263988
+        }
+      }
+    },
+    {
+      "fold": 4,
+      "held_groups": [
+        "real:LJ004",
+        "real:LJ008",
+        "real:LJ010",
+        "real:LJ011",
+        "real:LJ014",
+        "real:LJ021",
+        "real:LJ022",
+        "real:LJ024",
+        "real:LJ025",
+        "real:LJ046",
+        "synthetic:grad_tts",
+        "synthetic:pro_diff"
+      ],
+      "scores": {
+        "baseline": {
+          "normalized_minDCF": 0.7360088365243004,
+          "roc_auc": 0.710266323024055,
+          "average_precision": 0.8360545699731395
+        },
+        "lfcc_only": {
+          "normalized_minDCF": 0.5139911634756996,
+          "roc_auc": 0.8084192439862543,
+          "average_precision": 0.9018164523860213
+        },
+        "baseline_plus_lfcc": {
+          "normalized_minDCF": 0.5353460972017673,
+          "roc_auc": 0.7753436426116839,
+          "average_precision": 0.8927703389006111
+        },
+        "lowpass_baseline": {
+          "normalized_minDCF": 0.6782032400589102,
+          "roc_auc": 0.7265893470790378,
+          "average_precision": 0.8464323051206583
+        },
+        "lowpass_baseline_plus_lfcc": {
+          "normalized_minDCF": 0.5360824742268041,
+          "roc_auc": 0.8017611683848799,
+          "average_precision": 0.9050916483598114
+        }
+      }
+    },
+    {
+      "fold": 5,
+      "held_groups": [
+        "real:LJ001",
+        "real:LJ013",
+        "real:LJ020",
+        "real:LJ027",
+        "real:LJ028",
+        "real:LJ034",
+        "real:LJ038",
+        "real:LJ041",
+        "real:LJ042",
+        "real:LJ050",
+        "synthetic:wavegrad2",
+        "synthetic:your_tts"
+      ],
+      "scores": {
+        "baseline": {
+          "normalized_minDCF": 0.37499999999999994,
+          "roc_auc": 0.915798611111111,
+          "average_precision": 0.9576356138014697
+        },
+        "lfcc_only": {
+          "normalized_minDCF": 0.0,
+          "roc_auc": 1.0,
+          "average_precision": 0.9999999999999999
+        },
+        "baseline_plus_lfcc": {
+          "normalized_minDCF": 0.0,
+          "roc_auc": 1.0,
+          "average_precision": 1.0
+        },
+        "lowpass_baseline": {
+          "normalized_minDCF": 0.04613095238095238,
+          "roc_auc": 0.9982638888888888,
+          "average_precision": 0.9991301399581152
+        },
+        "lowpass_baseline_plus_lfcc": {
+          "normalized_minDCF": 0.0,
+          "roc_auc": 1.0,
+          "average_precision": 0.9999999999999998
+        }
+      }
+    }
+  ],
+  "artifacts": {
+    "raw": "models/arshiya_lfcc_baseline.joblib",
+    "common_band": "models/arshiya_lfcc_lowpass.joblib"
+  },
+  "common_band_cutoff_hz": 7000.0,
+  "top_combined_feature_importance": [
+    {
+      "feature": "lfcc_static_11_std",
+      "importance": 0.040913269599862766
+    },
+    {
+      "feature": "mfcc_14_mean",
+      "importance": 0.03436970637247408
+    },
+    {
+      "feature": "lfcc_delta2_11_std",
+      "importance": 0.03278516110671859
+    },
+    {
+      "feature": "lfcc_static_05_std",
+      "importance": 0.030577581793807825
+    },
+    {
+      "feature": "lfcc_static_04_mean",
+      "importance": 0.028810206690737673
+    },
+    {
+      "feature": "lfcc_static_17_std",
+      "importance": 0.027964698989924396
+    },
+    {
+      "feature": "lfcc_static_04_std",
+      "importance": 0.026211254159472102
+    },
+    {
+      "feature": "lfcc_delta_11_std",
+      "importance": 0.02530668605713769
+    },
+    {
+      "feature": "lfcc_static_10_std",
+      "importance": 0.02432056019352847
+    },
+    {
+      "feature": "mfcc_06_mean",
+      "importance": 0.024251831923111627
+    },
+    {
+      "feature": "lfcc_static_20_std",
+      "importance": 0.02215393463058935
+    },
+    {
+      "feature": "lfcc_static_13_std",
+      "importance": 0.022100128434250944
+    },
+    {
+      "feature": "lfcc_static_16_std",
+      "importance": 0.021968777272839114
+    },
+    {
+      "feature": "lfcc_static_09_std",
+      "importance": 0.02000589583185234
+    },
+    {
+      "feature": "lfcc_static_14_std",
+      "importance": 0.018013004783857887
+    },
+    {
+      "feature": "lfcc_delta_05_std",
+      "importance": 0.018001141533461884
+    },
+    {
+      "feature": "lfcc_delta2_09_std",
+      "importance": 0.017503677876427648
+    },
+    {
+      "feature": "lfcc_static_08_std",
+      "importance": 0.017446694059415496
+    },
+    {
+      "feature": "lfcc_static_13_mean",
+      "importance": 0.015327650797329917
+    },
+    {
+      "feature": "lfcc_delta_04_std",
+      "importance": 0.014423934748292011
+    }
+  ],
+  "paired_64kbps_mp3_stability": {
+    "raw_lfcc": {
+      "clips": 40,
+      "mean_absolute_score_change": 0.27759734326896224,
+      "max_absolute_score_change": 0.6304721520646503,
+      "rank_correlation": 0.8018199736763119
+    },
+    "lowpass_lfcc": {
+      "clips": 40,
+      "mean_absolute_score_change": 0.13692788927755267,
+      "max_absolute_score_change": 0.3971188700511519,
+      "rank_correlation": 0.9136798809771332
+    }
+  },
+  "paired_stability_note": "Training clips are used in this paired, in-sample stability diagnostic; it does not estimate accuracy.",
+  "note": "LFCC is concatenated with the baseline inputs and trained as one forest; common-band results test a fixed low-pass against source-bandwidth shortcuts."
+}

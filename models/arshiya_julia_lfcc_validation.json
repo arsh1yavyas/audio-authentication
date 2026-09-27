@@ -1,0 +1,346 @@
+{
+  "samples": 726,
+  "class_counts": {
+    "real": 242,
+    "synthetic": 484
+  },
+  "groups": 60,
+  "validation": "5-fold StratifiedGroupKFold; random_state=2026",
+  "metric": "normalized minDCF with Hearsay settings Pspoof=.3, Cmiss=1, Cfa=4",
+  "models": {
+    "julia_optimized_baseline": "Julia 75% standardized RBF SVM / 25% standardized logistic regression on baseline features",
+    "julia_optimized_plus_lfcc": "same Julia model on concatenated baseline + LFCC features",
+    "julia_optimized_commonband_plus_lfcc": "same Julia model on 7 kHz common-band baseline + LFCC features",
+    "arshiya_extra_trees_plus_lfcc": "Arshiya ExtraTrees on concatenated baseline + LFCC features",
+    "arshiya_extra_trees_commonband_plus_lfcc": "Arshiya ExtraTrees on 7 kHz common-band baseline + LFCC features",
+    "cost_sensitive_extra_trees_commonband_plus_lfcc": "Common-band ExtraTrees with per-clip class weights proportional to Hearsay error costs"
+  },
+  "metadata_status_counts": {
+    "consistent": 678,
+    "inconsistent": 48,
+    "unknown": 0
+  },
+  "out_of_fold_results": {
+    "julia_optimized_baseline": {
+      "normalized_minDCF": 0.2925029515938607,
+      "minDCF_threshold": 0.6523850221546663,
+      "roc_auc": 0.8958575233932109,
+      "average_precision": 0.9566677223601326
+    },
+    "julia_optimized_plus_lfcc": {
+      "normalized_minDCF": 0.22992916174734357,
+      "minDCF_threshold": 0.6144828605208499,
+      "roc_auc": 0.933867222184277,
+      "average_precision": 0.9721258133024061
+    },
+    "julia_optimized_commonband_plus_lfcc": {
+      "normalized_minDCF": 0.21251475796930344,
+      "minDCF_threshold": 0.6070540690048292,
+      "roc_auc": 0.9278481661088724,
+      "average_precision": 0.9699289020584356
+    },
+    "arshiya_extra_trees_plus_lfcc": {
+      "normalized_minDCF": 0.2128099173553719,
+      "minDCF_threshold": 0.6045101577284501,
+      "roc_auc": 0.9173639095690185,
+      "average_precision": 0.9671130054711564
+    },
+    "arshiya_extra_trees_commonband_plus_lfcc": {
+      "normalized_minDCF": 0.1909681227863046,
+      "minDCF_threshold": 0.47886793537844885,
+      "roc_auc": 0.910303257974182,
+      "average_precision": 0.9651622240047004
+    },
+    "cost_sensitive_extra_trees_commonband_plus_lfcc": {
+      "normalized_minDCF": 0.19923258559622195,
+      "minDCF_threshold": 0.5093364591368701,
+      "roc_auc": 0.9112680144798851,
+      "average_precision": 0.9654704988148699
+    }
+  },
+  "fold_details": [
+    {
+      "fold": 1,
+      "held_groups": [
+        "real:LJ005",
+        "real:LJ006",
+        "real:LJ012",
+        "real:LJ016",
+        "real:LJ017",
+        "real:LJ033",
+        "real:LJ036",
+        "real:LJ043",
+        "real:LJ047",
+        "real:LJ048",
+        "synthetic:diffgan_tts",
+        "synthetic:xtts_v2"
+      ],
+      "scores": {
+        "julia_optimized_baseline": {
+          "normalized_minDCF": 0.1421357939346578,
+          "minDCF_threshold": 0.3304584237687881,
+          "roc_auc": 0.9865348201136124,
+          "average_precision": 0.99304935111102
+        },
+        "julia_optimized_plus_lfcc": {
+          "normalized_minDCF": 0.0,
+          "minDCF_threshold": 0.9048031925485991,
+          "roc_auc": 1.0,
+          "average_precision": 1.0
+        },
+        "julia_optimized_commonband_plus_lfcc": {
+          "normalized_minDCF": 0.0,
+          "minDCF_threshold": 0.9141943148605819,
+          "roc_auc": 1.0,
+          "average_precision": 1.0
+        },
+        "arshiya_extra_trees_plus_lfcc": {
+          "normalized_minDCF": 0.0,
+          "minDCF_threshold": 0.6536114084608614,
+          "roc_auc": 1.0,
+          "average_precision": 1.0
+        },
+        "arshiya_extra_trees_commonband_plus_lfcc": {
+          "normalized_minDCF": 0.0,
+          "minDCF_threshold": 0.7002261965488318,
+          "roc_auc": 1.0,
+          "average_precision": 1.0
+        },
+        "cost_sensitive_extra_trees_commonband_plus_lfcc": {
+          "normalized_minDCF": 0.0,
+          "minDCF_threshold": 0.7153940825294338,
+          "roc_auc": 1.0,
+          "average_precision": 1.0
+        }
+      }
+    },
+    {
+      "fold": 2,
+      "held_groups": [
+        "real:LJ007",
+        "real:LJ009",
+        "real:LJ015",
+        "real:LJ018",
+        "real:LJ026",
+        "real:LJ029",
+        "real:LJ031",
+        "real:LJ035",
+        "real:LJ044",
+        "real:LJ049",
+        "synthetic:openvoicev2",
+        "synthetic:playht"
+      ],
+      "scores": {
+        "julia_optimized_baseline": {
+          "normalized_minDCF": 0.020618556701030927,
+          "minDCF_threshold": 0.7693323375745091,
+          "roc_auc": 0.9991584262571007,
+          "average_precision": 0.9995813383147698
+        },
+        "julia_optimized_plus_lfcc": {
+          "normalized_minDCF": 0.010309278350515464,
+          "minDCF_threshold": 0.9307972586768017,
+          "roc_auc": 0.9997896065642752,
+          "average_precision": 0.9998948032821375
+        },
+        "julia_optimized_commonband_plus_lfcc": {
+          "normalized_minDCF": 0.0,
+          "minDCF_threshold": 0.7985541839672812,
+          "roc_auc": 1.0,
+          "average_precision": 1.0
+        },
+        "arshiya_extra_trees_plus_lfcc": {
+          "normalized_minDCF": 0.0,
+          "minDCF_threshold": 0.6551104138838898,
+          "roc_auc": 1.0,
+          "average_precision": 1.0
+        },
+        "arshiya_extra_trees_commonband_plus_lfcc": {
+          "normalized_minDCF": 0.0,
+          "minDCF_threshold": 0.6404058566222386,
+          "roc_auc": 1.0,
+          "average_precision": 1.0
+        },
+        "cost_sensitive_extra_trees_commonband_plus_lfcc": {
+          "normalized_minDCF": 0.0,
+          "minDCF_threshold": 0.6536611551276937,
+          "roc_auc": 1.0,
+          "average_precision": 1.0
+        }
+      }
+    },
+    {
+      "fold": 3,
+      "held_groups": [
+        "real:LJ002",
+        "real:LJ003",
+        "real:LJ019",
+        "real:LJ023",
+        "real:LJ030",
+        "real:LJ032",
+        "real:LJ037",
+        "real:LJ039",
+        "real:LJ040",
+        "real:LJ045",
+        "synthetic:elevenlabs",
+        "synthetic:unit_speech"
+      ],
+      "scores": {
+        "julia_optimized_baseline": {
+          "normalized_minDCF": 0.010309278350515464,
+          "minDCF_threshold": 0.7860127303108863,
+          "roc_auc": 0.9997852233676976,
+          "average_precision": 0.9998948032821375
+        },
+        "julia_optimized_plus_lfcc": {
+          "normalized_minDCF": 0.041237113402061855,
+          "minDCF_threshold": 0.6144828605208499,
+          "roc_auc": 0.9969931271477663,
+          "average_precision": 0.9985601740306638
+        },
+        "julia_optimized_commonband_plus_lfcc": {
+          "normalized_minDCF": 0.010309278350515464,
+          "minDCF_threshold": 0.5627036750034616,
+          "roc_auc": 0.9991408934707904,
+          "average_precision": 0.9995917117484945
+        },
+        "arshiya_extra_trees_plus_lfcc": {
+          "normalized_minDCF": 0.061855670103092786,
+          "minDCF_threshold": 0.6045101577284501,
+          "roc_auc": 0.9974226804123711,
+          "average_precision": 0.9987250992469003
+        },
+        "arshiya_extra_trees_commonband_plus_lfcc": {
+          "normalized_minDCF": 0.020618556701030927,
+          "minDCF_threshold": 0.5513859227797432,
+          "roc_auc": 0.9995704467353952,
+          "average_precision": 0.9997885220620292
+        },
+        "cost_sensitive_extra_trees_commonband_plus_lfcc": {
+          "normalized_minDCF": 0.030927835051546393,
+          "minDCF_threshold": 0.5665781746817209,
+          "roc_auc": 0.9993556701030928,
+          "average_precision": 0.999681133745878
+        }
+      }
+    },
+    {
+      "fold": 4,
+      "held_groups": [
+        "real:LJ004",
+        "real:LJ008",
+        "real:LJ010",
+        "real:LJ011",
+        "real:LJ014",
+        "real:LJ021",
+        "real:LJ022",
+        "real:LJ024",
+        "real:LJ025",
+        "real:LJ046",
+        "synthetic:grad_tts",
+        "synthetic:pro_diff"
+      ],
+      "scores": {
+        "julia_optimized_baseline": {
+          "normalized_minDCF": 0.6012518409425627,
+          "minDCF_threshold": 0.03598067665358347,
+          "roc_auc": 0.8032646048109966,
+          "average_precision": 0.8765464040826539
+        },
+        "julia_optimized_plus_lfcc": {
+          "normalized_minDCF": 0.4583946980854198,
+          "minDCF_threshold": 0.043316891283490554,
+          "roc_auc": 0.869201030927835,
+          "average_precision": 0.9361430882639574
+        },
+        "julia_optimized_commonband_plus_lfcc": {
+          "normalized_minDCF": 0.48932253313696616,
+          "minDCF_threshold": 0.045957712769571564,
+          "roc_auc": 0.8689862542955327,
+          "average_precision": 0.9360931744939589
+        },
+        "arshiya_extra_trees_plus_lfcc": {
+          "normalized_minDCF": 0.4521354933726068,
+          "minDCF_threshold": 0.13075260046259604,
+          "roc_auc": 0.8142182130584192,
+          "average_precision": 0.9151659177483702
+        },
+        "arshiya_extra_trees_commonband_plus_lfcc": {
+          "normalized_minDCF": 0.5051546391752577,
+          "minDCF_threshold": 0.23431596550787834,
+          "roc_auc": 0.8036941580756014,
+          "average_precision": 0.9073148338578662
+        },
+        "cost_sensitive_extra_trees_commonband_plus_lfcc": {
+          "normalized_minDCF": 0.49963181148748165,
+          "minDCF_threshold": 0.2075957904981137,
+          "roc_auc": 0.805627147766323,
+          "average_precision": 0.9087183493849743
+        }
+      }
+    },
+    {
+      "fold": 5,
+      "held_groups": [
+        "real:LJ001",
+        "real:LJ013",
+        "real:LJ020",
+        "real:LJ027",
+        "real:LJ028",
+        "real:LJ034",
+        "real:LJ038",
+        "real:LJ041",
+        "real:LJ042",
+        "real:LJ050",
+        "synthetic:wavegrad2",
+        "synthetic:your_tts"
+      ],
+      "scores": {
+        "julia_optimized_baseline": {
+          "normalized_minDCF": 0.05654761904761905,
+          "minDCF_threshold": 0.4371440549359191,
+          "roc_auc": 0.9976128472222222,
+          "average_precision": 0.9987796909981886
+        },
+        "julia_optimized_plus_lfcc": {
+          "normalized_minDCF": 0.0,
+          "minDCF_threshold": 0.9286809062950786,
+          "roc_auc": 1.0,
+          "average_precision": 1.0
+        },
+        "julia_optimized_commonband_plus_lfcc": {
+          "normalized_minDCF": 0.0,
+          "minDCF_threshold": 0.9292956245437122,
+          "roc_auc": 1.0,
+          "average_precision": 1.0
+        },
+        "arshiya_extra_trees_plus_lfcc": {
+          "normalized_minDCF": 0.0,
+          "minDCF_threshold": 0.8716249999999998,
+          "roc_auc": 1.0,
+          "average_precision": 1.0
+        },
+        "arshiya_extra_trees_commonband_plus_lfcc": {
+          "normalized_minDCF": 0.0,
+          "minDCF_threshold": 0.8428874999999996,
+          "roc_auc": 1.0,
+          "average_precision": 0.9999999999999998
+        },
+        "cost_sensitive_extra_trees_commonband_plus_lfcc": {
+          "normalized_minDCF": 0.0,
+          "minDCF_threshold": 0.8327326979472143,
+          "roc_auc": 1.0,
+          "average_precision": 0.9999999999999999
+        }
+      }
+    }
+  ],
+  "artifacts": {
+    "julia_raw_lfcc": "models/arshiya_julia_lfcc_raw.joblib",
+    "julia_common_band_lfcc": "models/arshiya_julia_lfcc_lowpass.joblib",
+    "best_extra_trees_common_band_lfcc": "models/arshiya_lfcc_lowpass_candidate.joblib",
+    "cost_sensitive_common_band_lfcc": "models/arshiya_lfcc_lowpass_costweighted.joblib"
+  },
+  "common_band_cutoff_hz": 7000.0,
+  "caveat": "These results use only the local labeled manifest and grouped folds. The provided challenge test set has no labels here. LJ/DiffSSD source and bandwidth mismatch can inflate internal validation performance; treat this as candidate selection, not a challenge score guarantee."
+}

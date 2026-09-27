@@ -15,6 +15,7 @@ import re
 import shutil
 import tarfile
 import zipfile
+from contextlib import contextmanager
 from collections import Counter
 from pathlib import Path, PurePosixPath
 
@@ -22,14 +23,20 @@ SAFE_PART = re.compile(r"[A-Za-z0-9_.-]+\Z")
 MAX_AUDIO_SIZE = 30_000_000
 
 
-def nested_tar(zip_path: Path, expected_name: str):
-    """Open the ZIP after checking that it contains the expected TAR only."""
-    outer = zipfile.ZipFile(zip_path)
-    names = outer.namelist()
-    if names != [expected_name]:
-        outer.close()
-        raise ValueError(f"Expected only {expected_name} inside {zip_path}")
-    return outer
+@contextmanager
+def archive_tar(archive_path: Path, expected_name: str):
+    """Stream either the event's raw TAR or its ZIP-wrapped TAR variant."""
+    if zipfile.is_zipfile(archive_path):
+        with zipfile.ZipFile(archive_path) as outer:
+            names = [name for name in outer.namelist() if not name.endswith("/")]
+            if names != [expected_name]:
+                raise ValueError(f"Expected only {expected_name} inside {archive_path}")
+            with outer.open(expected_name) as stream:
+                with tarfile.open(fileobj=stream, mode="r|*") as tar:
+                    yield tar
+    else:
+        with tarfile.open(archive_path, mode="r:*") as tar:
+            yield tar
 
 
 def safe_parts(name: str) -> tuple[str, ...]:
@@ -56,19 +63,17 @@ def copy_member(tar: tarfile.TarFile, member: tarfile.TarInfo, destination: Path
 
 def prepare_real(archive: Path, output: Path) -> list[tuple[str, str, str]]:
     rows = []
-    with nested_tar(archive, "LJRealResampled.tar") as outer:
-        with outer.open("LJRealResampled.tar") as stream:
-            with tarfile.open(fileobj=stream, mode="r|*") as tar:
-                for member in tar:
-                    if not member.isfile():
-                        continue
-                    parts = safe_parts(member.name)
-                    if len(parts) != 2 or parts[0] != "resampled" or not re.fullmatch(r"LJ\d{3}-\d{4}\.wav", parts[1]):
-                        raise ValueError(f"Unexpected LJ file: {member.name}")
-                    destination = output / "real" / parts[1]
-                    copy_member(tar, member, destination)
-                    rows.append((str(destination.relative_to(output.parent)).replace("\\", "/"),
-                                 "real", f"real:{parts[1].split('-')[0]}"))
+    with archive_tar(archive, "LJRealResampled.tar") as tar:
+        for member in tar:
+            if not member.isfile():
+                continue
+            parts = safe_parts(member.name)
+            if len(parts) != 2 or parts[0] != "resampled" or not re.fullmatch(r"LJ\d{3}-\d{4}\.wav", parts[1]):
+                raise ValueError(f"Unexpected LJ file: {member.name}")
+            destination = output / "real" / parts[1]
+            copy_member(tar, member, destination)
+            rows.append((str(destination.relative_to(output.parent)).replace("\\", "/"),
+                         "real", f"real:{parts[1].split('-')[0]}"))
     if len(rows) != len({row[0] for row in rows}):
         raise ValueError("Duplicate real filenames")
     return rows
@@ -76,43 +81,39 @@ def prepare_real(archive: Path, output: Path) -> list[tuple[str, str, str]]:
 
 def prepare_synthetic(archive: Path, output: Path, target_count: int,
                       candidates_per_generator: int) -> tuple[list[tuple[str, str, str]], dict]:
-    # A max heap retains the lowest hash priorities per generator while the TAR
-    # is streamed once. Candidate files stay on disk for later rebalancing;
-    # only the rows selected below are written to this manifest.
+    # A max heap for each generator: the worst selected hash is at index zero.
     heaps: dict[str, list[tuple[int, str]]] = {}
     counts: Counter[str] = Counter()
     ignored = 0
-    with nested_tar(archive, "DiffSSD.tar") as outer:
-        with outer.open("DiffSSD.tar") as stream:
-            with tarfile.open(fileobj=stream, mode="r|*") as tar:
-                for member in tar:
-                    if not member.isfile():
-                        continue
-                    parts = safe_parts(member.name)
-                    if (len(parts) not in (4, 5) or parts[:2] != ("DiffSSD", "generated_speech")
-                            or Path(parts[-1]).suffix.lower() not in (".wav", ".mp3")):
-                        ignored += 1
-                        continue
-                    if len(parts) == 5:
-                        generator, speaker, filename = parts[2:]
-                    else:
-                        generator, filename = parts[2:]
-                        speaker = "_no_speaker"
-                    counts[generator] += 1
-                    total = sum(counts.values())
-                    if total % 5000 == 0:
-                        print(f"Scanned {total} synthetic audio files across {len(counts)} generators", flush=True)
-                    priority = int.from_bytes(hashlib.blake2b(member.name.encode(), digest_size=8).digest(), "big")
-                    heap = heaps.setdefault(generator, [])
-                    if len(heap) >= candidates_per_generator and priority >= -heap[0][0]:
-                        continue
-                    destination = output / "synthetic" / generator / speaker / filename
-                    copy_member(tar, member, destination)
-                    entry = (-priority, str(destination))
-                    if len(heap) < candidates_per_generator:
-                        heapq.heappush(heap, entry)
-                    else:
-                        heapq.heapreplace(heap, entry)
+    with archive_tar(archive, "DiffSSD.tar") as tar:
+        for member in tar:
+            if not member.isfile():
+                continue
+            parts = safe_parts(member.name)
+            if (len(parts) not in (4, 5) or parts[:2] != ("DiffSSD", "generated_speech")
+                    or Path(parts[-1]).suffix.lower() not in (".wav", ".mp3")):
+                ignored += 1
+                continue
+            if len(parts) == 5:
+                generator, speaker, filename = parts[2:]
+            else:
+                generator, filename = parts[2:]
+                speaker = "_no_speaker"
+            counts[generator] += 1
+            total = sum(counts.values())
+            if total % 5000 == 0:
+                print(f"Scanned {total} synthetic audio files across {len(counts)} generators", flush=True)
+            priority = int.from_bytes(hashlib.blake2b(member.name.encode(), digest_size=8).digest(), "big")
+            heap = heaps.setdefault(generator, [])
+            if len(heap) >= candidates_per_generator and priority >= -heap[0][0]:
+                continue
+            destination = output / "synthetic" / generator / speaker / filename
+            copy_member(tar, member, destination)
+            entry = (-priority, str(destination))
+            if len(heap) < candidates_per_generator:
+                heapq.heappush(heap, entry)
+            else:
+                heapq.heapreplace(heap, entry)
     if not heaps:
         raise ValueError("No synthetic audio files found")
 

@@ -1,7 +1,8 @@
-"""Check container metadata before decoding audio.
+"""Conservative file-container consistency checks used as a weak score prior.
 
-These checks can find malformed or mislabeled files. A coherent container is
-weak evidence about provenance, so it receives only a small score adjustment.
+This mirrors the Julia branch implementation: coherent container metadata is
+forgeable and only nudges a score slightly toward bona fide speech. Missing or
+unsupported metadata has no effect.
 """
 
 from __future__ import annotations
@@ -9,7 +10,6 @@ from __future__ import annotations
 import struct
 from dataclasses import dataclass
 from pathlib import Path
-
 
 METADATA_REAL_WEIGHT = 0.05
 ASF_MAGIC = bytes.fromhex("3026b2758e66cf11a6d900aa0062ce6c")
@@ -48,8 +48,9 @@ def _wav_metadata(stream, file_size: int) -> MetadataAnalysis:
     while position + 8 <= declared_end:
         stream.seek(position)
         chunk = stream.read(8)
+        if len(chunk) != 8:
+            return _inconsistent("WAVE chunk header is truncated")
         chunk_size = struct.unpack_from("<I", chunk, 4)[0]
-        # RIFF chunks occupy an even number of bytes; odd payloads have padding.
         next_position = position + 8 + chunk_size + (chunk_size % 2)
         if next_position > declared_end:
             return _inconsistent("A WAVE chunk extends past the declared RIFF size")
@@ -86,7 +87,6 @@ def _flac_metadata(header: bytes, file_size: int) -> MetadataAnalysis:
         return _inconsistent("FLAC STREAMINFO block is missing or malformed")
     if file_size < 42:
         return _inconsistent("FLAC file is shorter than its STREAMINFO block")
-    # STREAMINFO packs sample rate, channels, and bit depth into these 8 bytes.
     audio_info = int.from_bytes(header[18:26], "big")
     sample_rate = (audio_info >> 44) & 0xFFFFF
     channels = ((audio_info >> 41) & 0x7) + 1
@@ -110,7 +110,7 @@ def _mp3_metadata(header: bytes, file_size: int) -> MetadataAnalysis:
 
 
 def analyze_metadata(path: Path) -> MetadataAnalysis:
-    """Inspect the container header without decoding or trusting editable tags."""
+    """Inspect container headers without decoding or trusting editable tags."""
     suffix = path.suffix.lower()
     with path.open("rb") as stream:
         file_size = path.stat().st_size
@@ -143,10 +143,12 @@ def analyze_metadata(path: Path) -> MetadataAnalysis:
             _inconsistent(f"The {suffix} extension does not match its container signature"))
 
 
-def adjust_score(synthetic_score: float, analysis: MetadataAnalysis) -> float:
-    """Give a small real-side weight only when checked metadata is coherent."""
-    # This is a transparent heuristic after audio classification, not a
-    # calibrated probability update or evidence that the speaker is real.
+def adjust_score(synthetic_score: float, analysis: MetadataAnalysis,
+                 real_weight: float = METADATA_REAL_WEIGHT) -> float:
+    """Apply a small real-side prior only to structurally coherent containers."""
+    score = float(synthetic_score)
+    if not 0.0 <= score <= 1.0 or not 0.0 <= real_weight <= 1.0:
+        raise ValueError("score and real_weight must be between zero and one")
     if analysis.status == "consistent":
-        return float(synthetic_score * (1 - METADATA_REAL_WEIGHT))
-    return float(synthetic_score)
+        return score * (1.0 - real_weight)
+    return score

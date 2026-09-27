@@ -1,0 +1,279 @@
+{
+  "dataset": {
+    "original_samples": 726,
+    "original_real": 242,
+    "original_synthetic": 484,
+    "expanded_samples": 1460,
+    "expanded_real": 730,
+    "expanded_synthetic": 730,
+    "expanded_group_count": 86,
+    "expanded_real_group_counts": {
+      "lj_chapters": 50,
+      "librispeech_speakers": 26
+    },
+    "librispeech_archive_md5": "6d7ab67ac6a1d2c993d050e16d61080d"
+  },
+  "validation": "Paired 5-fold StratifiedGroupKFold, random_state=2026; same held-out groups and clips for both training corpora",
+  "metric": "normalized minDCF; Pspoof=.3, Cmiss=1, Cfa=4",
+  "score_direction": "higher means synthetic",
+  "model": "Julia 75% standardized RBF SVM / 25% standardized logistic regression on 84 baseline + 120 LFCC features",
+  "out_of_fold_results": {
+    "original_lj_diffssd_training": {
+      "normalized_minDCF": 0.7602739726027397,
+      "minDCF_threshold": 0.9477432783301999,
+      "roc_auc": 0.7389435166072433,
+      "average_precision": 0.7561310446962812
+    },
+    "librispeech_added_same_lj_diffssd_training": {
+      "normalized_minDCF": 0.22015655577299412,
+      "minDCF_threshold": 0.7008583247896253,
+      "roc_auc": 0.9502983674235317,
+      "average_precision": 0.9607786245809826
+    },
+    "expanded_lj_librispeech_diffssd_training": {
+      "normalized_minDCF": 0.20567514677103715,
+      "minDCF_threshold": 0.6620274219547521,
+      "roc_auc": 0.9629724150872584,
+      "average_precision": 0.9693427061737612
+    }
+  },
+  "fold_details": [
+    {
+      "fold": 1,
+      "held_out_groups": [
+        "real:LJ001",
+        "real:LJ003",
+        "real:LJ004",
+        "real:LJ007",
+        "real:LJ012",
+        "real:LJ018",
+        "real:LJ021",
+        "real:LJ036",
+        "real:LJ043",
+        "real:LJ047",
+        "real:libri:174",
+        "real:libri:2412",
+        "real:libri:5338",
+        "real:libri:5694",
+        "real:libri:5895",
+        "synthetic:diffgan_tts",
+        "synthetic:wavegrad2"
+      ],
+      "held_out_samples": 292,
+      "held_out_real": 146,
+      "held_out_synthetic": 146,
+      "original_training_samples": 579,
+      "librispeech_added_training_samples": 392,
+      "librispeech_augmented_training_samples": 971,
+      "expanded_training_samples": 1168,
+      "original_corpus": {
+        "normalized_minDCF": 0.8708414872798435,
+        "minDCF_threshold": 0.9461196281405795,
+        "roc_auc": 0.6935166072433853,
+        "average_precision": 0.5797075674348029
+      },
+      "librispeech_added_only": {
+        "normalized_minDCF": 0.04403131115459882,
+        "minDCF_threshold": 0.7189009449701474,
+        "roc_auc": 0.996059298179771,
+        "average_precision": 0.9955618422486909
+      },
+      "expanded_corpus": {
+        "normalized_minDCF": 0.06066536203522504,
+        "minDCF_threshold": 0.6776556964546562,
+        "roc_auc": 0.9948864702570839,
+        "average_precision": 0.9934885233628217
+      }
+    },
+    {
+      "fold": 2,
+      "held_out_groups": [
+        "real:LJ002",
+        "real:LJ009",
+        "real:LJ026",
+        "real:LJ028",
+        "real:LJ029",
+        "real:LJ038",
+        "real:LJ040",
+        "real:LJ041",
+        "real:LJ042",
+        "real:LJ050",
+        "real:libri:1272",
+        "real:libri:251",
+        "real:libri:3752",
+        "real:libri:6241",
+        "real:libri:8842",
+        "synthetic:openvoicev2",
+        "synthetic:your_tts"
+      ],
+      "held_out_samples": 292,
+      "held_out_real": 146,
+      "held_out_synthetic": 146,
+      "original_training_samples": 577,
+      "librispeech_added_training_samples": 394,
+      "librispeech_augmented_training_samples": 971,
+      "expanded_training_samples": 1168,
+      "original_corpus": {
+        "normalized_minDCF": 0.5499021526418787,
+        "minDCF_threshold": 0.9498944486493713,
+        "roc_auc": 0.8634359166823043,
+        "average_precision": 0.8629331990378185
+      },
+      "librispeech_added_only": {
+        "normalized_minDCF": 0.04207436399217221,
+        "minDCF_threshold": 0.5469086726112952,
+        "roc_auc": 0.9987333458434978,
+        "average_precision": 0.9987100246092321
+      },
+      "expanded_corpus": {
+        "normalized_minDCF": 0.023483365949119372,
+        "minDCF_threshold": 0.6488436012558156,
+        "roc_auc": 0.9987802589604052,
+        "average_precision": 0.9987214488866698
+      }
+    },
+    {
+      "fold": 3,
+      "held_out_groups": [
+        "real:LJ010",
+        "real:LJ015",
+        "real:LJ016",
+        "real:LJ017",
+        "real:LJ027",
+        "real:LJ035",
+        "real:LJ039",
+        "real:LJ044",
+        "real:LJ046",
+        "real:LJ049",
+        "real:libri:3000",
+        "real:libri:3536",
+        "real:libri:777",
+        "real:libri:8297",
+        "real:libri:84",
+        "synthetic:grad_tts",
+        "synthetic:unit_speech"
+      ],
+      "held_out_samples": 292,
+      "held_out_real": 146,
+      "held_out_synthetic": 146,
+      "original_training_samples": 577,
+      "librispeech_added_training_samples": 394,
+      "librispeech_augmented_training_samples": 971,
+      "expanded_training_samples": 1168,
+      "original_corpus": {
+        "normalized_minDCF": 0.6105675146771037,
+        "minDCF_threshold": 0.9411575866535836,
+        "roc_auc": 0.6398010883843123,
+        "average_precision": 0.736830160931893
+      },
+      "librispeech_added_only": {
+        "normalized_minDCF": 0.5,
+        "minDCF_threshold": 0.08002976265715879,
+        "roc_auc": 0.8840776881215988,
+        "average_precision": 0.8944527244287901
+      },
+      "expanded_corpus": {
+        "normalized_minDCF": 0.4863013698630137,
+        "minDCF_threshold": 0.7137165574164694,
+        "roc_auc": 0.8919121786451492,
+        "average_precision": 0.8997423882966921
+      }
+    },
+    {
+      "fold": 4,
+      "held_out_groups": [
+        "real:LJ006",
+        "real:LJ008",
+        "real:LJ013",
+        "real:LJ014",
+        "real:LJ020",
+        "real:LJ024",
+        "real:LJ025",
+        "real:LJ031",
+        "real:LJ034",
+        "real:LJ037",
+        "real:libri:1988",
+        "real:libri:1993",
+        "real:libri:2803",
+        "real:libri:6295",
+        "real:libri:6319",
+        "real:libri:7850",
+        "synthetic:playht",
+        "synthetic:pro_diff"
+      ],
+      "held_out_samples": 292,
+      "held_out_real": 146,
+      "held_out_synthetic": 146,
+      "original_training_samples": 588,
+      "librispeech_added_training_samples": 384,
+      "librispeech_augmented_training_samples": 972,
+      "expanded_training_samples": 1168,
+      "original_corpus": {
+        "normalized_minDCF": 0.5068493150684932,
+        "minDCF_threshold": 0.9590154006484768,
+        "roc_auc": 0.7051979733533497,
+        "average_precision": 0.7797955758674696
+      },
+      "librispeech_added_only": {
+        "normalized_minDCF": 0.025440313111545983,
+        "minDCF_threshold": 0.7029194246222015,
+        "roc_auc": 0.9973259523362732,
+        "average_precision": 0.9975760149309417
+      },
+      "expanded_corpus": {
+        "normalized_minDCF": 0.04794520547945205,
+        "minDCF_threshold": 0.7383216280360453,
+        "roc_auc": 0.997888909739163,
+        "average_precision": 0.9979979727769501
+      }
+    },
+    {
+      "fold": 5,
+      "held_out_groups": [
+        "real:LJ005",
+        "real:LJ011",
+        "real:LJ019",
+        "real:LJ022",
+        "real:LJ023",
+        "real:LJ030",
+        "real:LJ032",
+        "real:LJ033",
+        "real:LJ045",
+        "real:LJ048",
+        "real:libri:1462",
+        "real:libri:2035",
+        "real:libri:2428",
+        "real:libri:3576",
+        "real:libri:7976",
+        "synthetic:elevenlabs",
+        "synthetic:xtts_v2"
+      ],
+      "held_out_samples": 292,
+      "held_out_real": 146,
+      "held_out_synthetic": 146,
+      "original_training_samples": 583,
+      "librispeech_added_training_samples": 388,
+      "librispeech_augmented_training_samples": 971,
+      "expanded_training_samples": 1168,
+      "original_corpus": {
+        "normalized_minDCF": 0.5919765166340508,
+        "minDCF_threshold": 0.9464356943216383,
+        "roc_auc": 0.7699380746856821,
+        "average_precision": 0.8134932514073328
+      },
+      "librispeech_added_only": {
+        "normalized_minDCF": 0.3532289628180039,
+        "minDCF_threshold": 0.2255765727878079,
+        "roc_auc": 0.9285982360668044,
+        "average_precision": 0.9382285959739669
+      },
+      "expanded_corpus": {
+        "normalized_minDCF": 0.22602739726027396,
+        "minDCF_threshold": 0.16674403150524617,
+        "roc_auc": 0.9699756051792081,
+        "average_precision": 0.9709632803717321
+      }
+    }
+  ],
+  "caveat": "Mini LibriSpeech adds real speakers only; the synthetic examples remain from DiffSSD. This validates real-source diversity and generator-held-out performance, not transfer to unseen synthesis toolkits. The challenge test set and answer key were not used."
+}

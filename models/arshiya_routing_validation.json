@@ -1,0 +1,156 @@
+{
+  "metric": "normalized minDCF; Pspoof=0.3, Cmiss=1, Cfa=4",
+  "score_direction": "larger means synthetic",
+  "clusterer": "kmeans",
+  "primary_score_column": "arshiya_score",
+  "secondary_score_column": "arshiya_spectral_score",
+  "score_source": "out-of-fold component scores; inspect provenance before use",
+  "folds": [
+    {
+      "fold": 1,
+      "test_groups": [
+        "real:LJ001",
+        "real:LJ003",
+        "real:LJ006",
+        "real:LJ014",
+        "real:LJ021",
+        "real:LJ024",
+        "real:LJ025",
+        "real:LJ026",
+        "real:LJ027",
+        "real:LJ033",
+        "real:LJ035",
+        "real:LJ036",
+        "real:LJ041",
+        "synthetic:xtts_v2",
+        "synthetic:your_tts"
+      ],
+      "global_blend_min_dcf": 0.0,
+      "conditional_min_dcf": 0.0,
+      "global_alpha": 1.0
+    },
+    {
+      "fold": 2,
+      "test_groups": [
+        "real:LJ008",
+        "real:LJ017",
+        "real:LJ020",
+        "real:LJ022",
+        "real:LJ026",
+        "real:LJ028",
+        "real:LJ030",
+        "real:LJ032",
+        "real:LJ040",
+        "real:LJ044",
+        "real:LJ046",
+        "real:LJ048",
+        "real:LJ050",
+        "synthetic:xtts_v2",
+        "synthetic:your_tts"
+      ],
+      "global_blend_min_dcf": 0.0,
+      "conditional_min_dcf": 0.0,
+      "global_alpha": 1.0
+    },
+    {
+      "fold": 3,
+      "test_groups": [
+        "real:LJ002",
+        "real:LJ014",
+        "real:LJ015",
+        "real:LJ017",
+        "real:LJ019",
+        "real:LJ021",
+        "real:LJ022",
+        "real:LJ026",
+        "real:LJ027",
+        "real:LJ034",
+        "real:LJ049",
+        "real:LJ050",
+        "synthetic:diffgan_tts",
+        "synthetic:grad_tts",
+        "synthetic:playht"
+      ],
+      "global_blend_min_dcf": 0.6002091909035697,
+      "conditional_min_dcf": 0.6002091909035697,
+      "global_alpha": 1.0
+    },
+    {
+      "fold": 4,
+      "test_groups": [
+        "real:LJ012",
+        "real:LJ014",
+        "real:LJ017",
+        "real:LJ019",
+        "real:LJ024",
+        "real:LJ027",
+        "real:LJ032",
+        "real:LJ036",
+        "real:LJ041",
+        "real:LJ042",
+        "real:LJ048",
+        "synthetic:diffgan_tts",
+        "synthetic:elevenlabs",
+        "synthetic:grad_tts",
+        "synthetic:unit_speech"
+      ],
+      "global_blend_min_dcf": 0.4615384615384616,
+      "conditional_min_dcf": 0.4615384615384616,
+      "global_alpha": 1.0
+    },
+    {
+      "fold": 5,
+      "test_groups": [
+        "real:LJ004",
+        "real:LJ005",
+        "real:LJ006",
+        "real:LJ007",
+        "real:LJ010",
+        "real:LJ028",
+        "real:LJ029",
+        "real:LJ032",
+        "real:LJ037",
+        "real:LJ046",
+        "real:LJ047",
+        "real:LJ048",
+        "synthetic:grad_tts",
+        "synthetic:openvoicev2",
+        "synthetic:pro_diff"
+      ],
+      "global_blend_min_dcf": 0.5305772994129159,
+      "conditional_min_dcf": 0.5305772994129159,
+      "global_alpha": 1.0
+    }
+  ],
+  "mean_global_blend_min_dcf": 0.3184649903709894,
+  "mean_conditional_min_dcf": 0.3184649903709894,
+  "final_router_training_summary": {
+    "p_spoof": 0.3,
+    "c_miss": 1.0,
+    "c_fa": 4.0,
+    "global_blend_alpha": 1.0,
+    "global_blend_min_dcf": 0.34592680047225505,
+    "conditional_min_dcf_in_sample": 0.34592680047225505,
+    "cluster_sizes": {
+      "0": 104,
+      "1": 526,
+      "2": 96
+    },
+    "quality_features": [
+      "duration_seconds",
+      "peak_level",
+      "rms_level",
+      "clipped_fraction",
+      "active_fraction",
+      "spectral_flatness",
+      "high_frequency_fraction",
+      "low_frequency_fraction",
+      "spectral_flux",
+      "bytes_per_second",
+      "has_metadata",
+      "has_encoder_tag"
+    ],
+    "note": "Choose final policy using grouped out-of-fold predictions; this fit metric is descriptive."
+  },
+  "artifact": "models/arshiya_kmeans_router.joblib"
+}

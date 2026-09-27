@@ -1,6 +1,6 @@
 # Hearsay audio authentication
 
-This repository contains a trained audio classifier for the HackGT 13 Hearsay challenge. It returns a score from 0 (real) to 1 (synthetic). The recommended model is a **75% RBF support-vector machine and 25% logistic-regression blend**, selected using generator-held-out validation. The earlier two-random-forest model remains in `models/hearsay-split.joblib` for comparison. Retrain the model if your data or feature code changes.
+This repository contains audio classifiers for the HackGT 13 Hearsay challenge. They return a score from 0 (real) to 1 (synthetic). The current recommended scorer is `models/arshiya_librispeech_julia_lfcc.joblib`: Julia's 75% RBF SVM / 25% logistic-regression model trained on the original 84 features plus 120 LFCC features, using LJ Speech, Mini LibriSpeech, and DiffSSD. On the same five grouped folds, it reduced normalized minDCF from **0.2775** for the 84-feature Julia model to **0.2084**. See `models/arshiya_librispeech_julia_lfcc_validation.json`; these grouped folds are development evidence, not a challenge-set guarantee. The earlier forest and baseline models remain available for comparison. Retrain the model if your data or feature code changes.
 
 ## Approach
 
@@ -18,11 +18,11 @@ FFmpeg decodes the first 120 seconds of the first audio stream to mono 16 kHz au
 | Spectral rolloff | Mean and standard deviation, at 85% cumulative energy |
 | Spectral flatness | Mean and standard deviation |
 
-The voice-cloning, speaker-embedding, CNN, RNN, and LSTM sections of `Research.md` describe background and alternative models. They are not implemented in either saved classifier. Compression forensics, acoustic environment, splice, and neural anti-spoofing approaches are further extensions, not detectors claimed by this version.
+The current LFCC candidate adds static, delta, and delta-delta linear-frequency cepstral statistics to the 84 baseline features. The voice-cloning, speaker-embedding, CNN, RNN, and LSTM sections of `Research.md` describe background and alternative models. They are not implemented in the saved classifiers. Compression forensics, acoustic environment, splice, and neural anti-spoofing approaches are further extensions, not detectors claimed by this version.
 
 Before decoding, the metadata check inspects the file's container signature and, for WAV, declared chunk sizes and audio parameters. FLAC and MP3 headers are also checked. When the inspected metadata is coherent, the final synthetic score is multiplied by **0.95**, giving a small additional weight to “real.” Inconsistent or unrecognized metadata leaves the audio score unchanged. The score explanation shows both the audio score and this adjustment. A clean header can be forged and is common in synthetic audio, so this is a weak heuristic rather than proof of authenticity.
 
-The optimized model standardizes all 84 features before fitting an RBF SVM and logistic regression. Their synthetic scores are averaged with weights 0.75 and 0.25. Its score explanation shows each component score and the metadata adjustment; it does not claim an additive feature explanation. The original model averages two 300-tree forests, one using all 84 features and the other using 20 spectral and statistical features. Only the forest model provides tree-path feature contributions. These describe model behavior, not proof that a clip was generated.
+The optimized baseline standardizes all 84 features before fitting an RBF SVM and logistic regression. Their synthetic scores are averaged with weights 0.75 and 0.25. The recommended LFCC candidate uses the same model on all 204 features. Score explanations do not claim additive feature explanations. The original model averages two 300-tree forests, one using all 84 features and the other using 20 spectral and statistical features. Only the forest model provides tree-path feature contributions. These describe model behavior, not proof that a clip was generated.
 
 ## Install
 
@@ -54,13 +54,15 @@ python scripts/prepare_training_data.py --real-archive "/path/to/LJRealResampled
 
 The script uses all 242 LJ real clips and up to twice as many synthetic clips, sampled deterministically across ten DiffSSD generator families. The ZIPs remain untouched. It retains additional synthetic candidates on disk for the later LibriSpeech rebalancing step; only selected clips appear in `data/train.csv`. The `group` column keeps LJ chapters and synthetic generator families whole in validation. LJ chapters still share one speaker, so this grouping alone does not test an unseen real voice. The first model marked a spot check of challenge files almost uniformly synthetic.
 
-Both saved models use a deterministic selection of real clips from 26 speakers in [OpenSLR Mini LibriSpeech SLR31](https://openslr.org/31/) (`dev-clean-2.tar.gz`, CC BY 4.0). Download that archive from the official page, verify its MD5 is `6d7ab67ac6a1d2c993d050e16d61080d`, then run:
+The expanded models use a deterministic selection of real clips from 26 speakers in [OpenSLR Mini LibriSpeech SLR31](https://openslr.org/31/) (`dev-clean-2.tar.gz`, CC BY 4.0). Download that archive from the official page, verify its MD5 is `6d7ab67ac6a1d2c993d050e16d61080d`, then run:
 
 ```sh
 python scripts/add_librispeech_real.py --archive data/external/dev-clean-2.tar.gz --data data
 ```
 
-This updates `data/train.csv` with 242 LJ real clips, 488 LibriSpeech real clips, and 730 DiffSSD synthetic clips balanced across the ten generators. The `group` column identifies LibriSpeech speakers, LJ chapters, and synthetic generators so related clips stay together in a split. The included training summary is in `data/train_summary.json` after preparation.
+This updates `data/train.csv` with 242 LJ real clips, 488 LibriSpeech real clips, and 730 DiffSSD synthetic clips balanced across the ten generators. Before replacing the original manifest, the script saves it once as `data/train_pre_librispeech.csv` for paired evaluation. The `group` column identifies LibriSpeech speakers, LJ chapters, and synthetic generators so related clips stay together in a split. The included training summary is in `data/train_summary.json` after preparation.
+
+The preparation scripts accept either the original raw `.tar` files or the ZIP-wrapped TAR archives. The challenge test archive is only for generating predictions; do not use its score key or hidden labels for training, route selection, or evaluation.
 
 Prepare a UTF-8 CSV (or `.tsv`) with `filename,label` columns. Audio paths are relative to the manifest. Accepted labels are `real`, `bonafide`, or `0` and `synthetic`, `spoof`, or `1`. An optional `group` column should identify a speaker, source recording, or generator family shared by clips. The validation split keeps entire groups together when provided. Example:
 
@@ -86,17 +88,17 @@ The `hearsay train` command reproduces the forest baseline. `scripts.train_optim
 
 The supplied training set is difficult to validate across unseen generators. The original `models/hearsay.joblib` and its saved reports predate the split utility: its one group holdout (Grad-TTS plus unseen real groups) yielded ROC AUC **0.567** and balanced accuracy **0.489** at 0.5. A separate leave-one-generator-family-out check across all ten families, using one fixed real-speaker split, averaged ROC AUC **0.914** with a worst family of **0.715**. On five different real-speaker splits for Grad-TTS alone, its mean AUC was **0.695** and its lowest was **0.571**. Results depend strongly on which real speakers are held out. See `models/validation.json`, `models/ensemble_holdout.json`, and `models/grad_holdout.json` for the exact splits and scores. Retraining with the commands above writes a new model and report.
 
-On the current group-disjoint split (1,167 training and 293 test clips), the recommended model improves both accuracy at the fixed 0.5 cutoff and minDCF:
+On the current group-disjoint split (1,167 training and 293 test clips), Julia's saved optimized model improved these original-run accuracy metrics:
 
 | Evaluation | Forest baseline | Optimized blend |
 | --- | ---: | ---: |
 | Training-only generator-held-out validation accuracy | 0.7464 | 0.8509 |
-| Training-only validation minDCF | 0.6007 | 0.3487 |
 | Held-out test accuracy | 0.8874 | 0.9454 |
 | Held-out test ROC AUC | 0.9482 | 0.9930 |
-| Held-out test minDCF | 0.2929 | 0.1088 |
 
-minDCF is the normalized [ASVspoof 5 Track 1 detection cost](https://www.asvspoof.org/file/ASVspoof5___Evaluation_Plan_Phase2.pdf), minimized over thresholds, with a 5% spoof prior, cost 1 for rejecting real speech, and cost 10 for accepting spoofed speech. The original and optimized models have 0.8703 and 0.9454 audio-only held-out accuracy, respectively; the optimized model's accuracy gain does not depend on metadata adjustment. The held-out synthetic groups are only PlayHT and Pro Diff. PlayHT uses `.wav` names with MP3 headers, a source-specific mismatch that may not recur with other generators or transcoded files. Some synthetic speaker IDs recur across generator families, and LJ chapters share a narrator. See `models/optimized-comparison.json` for all metrics and confusion matrices.
+The minDCF values in Julia's committed `models/optimized-comparison.json` use ASVspoof defaults (`Pspoof=.05`, `Cfa=10`), so they are not Hearsay challenge results. `scripts/train_optimized.py` now reports minDCF with the challenge settings (`Pspoof=.3`, `Cmiss=1`, `Cfa=4`). That historical report uses a separately selected 1,460-clip corpus and its original split has not been reproduced from the current manifest. See `models/arshiya_julia_lfcc_validation.json` for the earlier corrected grouped-fold results on 726 LJ/DiffSSD clips, and the LibriSpeech reports below for expanded-corpus results.
+
+The original and optimized models have 0.8703 and 0.9454 audio-only held-out accuracy, respectively; the optimized model's accuracy gain does not depend on metadata adjustment. The held-out synthetic groups are only PlayHT and Pro Diff. PlayHT uses `.wav` names with MP3 headers, a source-specific mismatch that may not recur with other generators or transcoded files. Some synthetic speaker IDs recur across generator families, and LJ chapters share a narrator.
 
 No independent labeled Hearsay test results are available.
 
@@ -122,10 +124,165 @@ In PowerShell, with Docker Desktop running, run:
 
 ```powershell
 docker build -t hearsay .
-docker run --rm -v "${PWD}/data:/data:ro" -v "${PWD}/predictions:/predictions" hearsay predict --model /app/models/hearsay-optimized.joblib --input /data/test --template /data/HGT_Hearsay_score_template.csv --output /predictions/hearsay_predictions.tsv
+docker run --rm -v "${PWD}/data:/data:ro" -v "${PWD}/predictions:/predictions" hearsay predict-lfcc --model /app/models/arshiya_librispeech_julia_lfcc.joblib --input /data/test --template /data/HGT_Hearsay_score_template.csv --output /predictions/hearsay_predictions.tsv
 ```
 
-The image includes the optimized model. The command scores `/data/test`, checks filenames against the provided template, and writes `predictions/hearsay_predictions.tsv` in template order.
+The image includes the current LFCC candidate, the Julia baseline, the forest baseline, and prior LFCC candidates. The command scores `/data/test`, checks filenames against the provided template, and writes the TSV in template order. For routed inference, build and pass a router artifact explicitly; Qiskit itself is not needed by the scoring container.
+
+## Conditional fusion (Arshiya branch)
+
+`hearsay/forensics.py` extracts lightweight recording-condition and optional metadata indicators. Missing metadata is neutral. These indicators describe file/recording conditions; they are not direct real/synthetic decisions. `hearsay/routing.py` supports a global blend and a K-means condition router. For both components, larger scores must mean “more synthetic.”
+
+The evaluator uses normalized ASVspoof-style minDCF with the Hearsay settings: `Pspoof=0.3`, `Cmiss=1`, `Cfa=4`. It expects out-of-fold score rows with `filename,label,group,arshiya_score,julia_score` columns. Component scores must come from models that did not train on the corresponding clip. Example:
+
+```sh
+python scripts/generate_oof_scores.py --manifest data/train.csv \
+  --output data/arshiya_oof.tsv
+# Have Julia produce scores for those exact filenames and the same group-held-out folds.
+# Merge the score columns into data/oof_scores.tsv, retaining label and group.
+python scripts/evaluate_routing.py --scores data/oof_scores.tsv \
+  --output models/router.joblib --report models/routing_validation.json
+```
+
+The report compares global weighted fusion with per-quality-cluster blend weights using a second group holdout. Small or one-class clusters fall back to the global blend. Fit the final router from grouped out-of-fold component scores, and retain the split results in project documentation.
+
+At inference, Julia can provide a TSV/CSV with `filename,julia-score`. If the score file is supplied, `predict-routed` uses the saved cluster router, or a 50/50 blend without a router. If no Julia score file is supplied, it safely falls back to the bundled Arshiya model:
+
+```sh
+python -m hearsay predict-routed --model models/hearsay-optimized.joblib \
+  --router models/router.joblib --julia-scores data/julia_predictions.tsv \
+  --input data/test --template data/HGT_Hearsay_score_template.csv \
+  --output predictions/Arshiya_predictions.tsv
+```
+
+The optional Qiskit experiment uses a quantum fidelity kernel plus spectral clustering on a bounded subset of quality vectors. `evaluate_routing.py --clusterer qiskit` evaluates that route on grouped holdouts and saves a router artifact with a nearest-centroid inference approximation, so the standard Docker scorer does not need Qiskit. Qiskit is an optional research dependency and is not included in the required image:
+
+```sh
+python -m pip install -r requirements-quantum.txt
+python scripts/evaluate_routing.py --scores data/oof_scores.tsv \
+  --clusterer qiskit --output models/quantum_router.joblib \
+  --report models/quantum_routing_validation.json
+```
+
+The standalone `scripts/quantum_cluster.py` also reports agreement with ordinary K-means using ARI/NMI. Cluster agreement alone does not establish better detection; compare quantum-derived routing against the global blend using the grouped out-of-fold minDCF report before selecting it.
+
+## Arshiya experimental feature views
+
+`hearsay/temporal.py` keeps coarse time order in eight audio windows and measures how energy, spectral shape, and frame-level activity change. `hearsay/encoding.py` records WAV format facts where available plus decoded-signal clues such as quantization levels and spectral cutoff. Neither module modifies or denoises audio. Their separate ExtraTrees candidates are experimental and do not change the standard submission CLI.
+
+Run the grouped comparison and paired lossy-re-encoding probe with:
+
+```sh
+python scripts/evaluate_feature_views.py --manifest data/train.csv --cache data/train_features.npz
+```
+
+The report compares baseline, temporal, encoding header facts, signal-level encoding traces, and fixed equal-weight blends using five-fold `StratifiedGroupKFold`, keeping each real speaker and synthetic generator family inside one fold. It uses normalized minDCF with `Pspoof=0.3`, `Cmiss=1`, `Cfa=4`. The MP3 probe is an in-sample stability check only; it is not an accuracy result. The current DiffSSD/LJ source mix has a pronounced provenance cue (real WAVs are 16 kHz, while synthetic WAVs have a 22.05 kHz median source rate). Therefore the header-only and signal-level encoding models are diagnostics and should not vote on authenticity. The signal-only candidate excludes header fields, but it still shows source/bandwidth bias and substantial score movement after MP3 conversion. Generated candidate artifacts are `models/arshiya_temporal_candidate.joblib` and `models/arshiya_encoding_candidate.joblib`.
+
+Current results are in `models/arshiya_feature_views_validation.json`. On five grouped folds, the temporal expert alone was weaker than the baseline (normalized minDCF 0.457 vs 0.381); a fixed 50/50 temporal blend modestly improved it to 0.357. The signal-only encoding expert's very low validation cost is not trustworthy: its score rank correlation after lossy MP3 conversion was only 0.79, and it likely exploits recording bandwidth/source differences. Keep temporal as a candidate for further independent validation; do not include encoding scores in the submission blend without source-matched external validation.
+
+## LFCC spectral evidence (single model, no score blending)
+
+`hearsay/lfcc.py` extracts linear-frequency cepstral coefficients with static, delta, and delta-delta statistics. The experimental candidate concatenates these 120 LFCC values with the existing 84 acoustic features and trains one ExtraTrees model. A second candidate applies a fixed 7 kHz low-pass filter to every clip before extracting the same features; this tests whether restricting bandwidth reduces codec/source-rate shortcuts. This is a deterministic preprocessing step, not an attempt to denoise or reconstruct the original recording. Neither candidate changes the default `predict` scorer.
+
+Evaluate both candidates with grouped speaker/generator folds and the challenge operating assumptions:
+
+```sh
+python scripts/evaluate_lfcc.py --manifest data/train.csv
+```
+
+The current report (`models/arshiya_lfcc_validation.json`) gives normalized minDCF (Pspoof=0.3, Cmiss=1, Cfa=4) of 0.369 for the existing baseline, 0.222 for one forest trained on baseline+LFCC inputs, and 0.193 for the common-band baseline+LFCC forest. Use the low-pass candidate with:
+
+```sh
+python -m hearsay predict-lfcc --model models/arshiya_lfcc_lowpass.joblib \
+  --input data/test --output predictions/Arshiya_lfcc_predictions.tsv
+```
+
+If the challenge filename-order template is available, pass it with `--template /path/to/template.tsv` so output rows follow its order exactly.
+
+These scores are grouped cross-validation evidence on 726 LJ/DiffSSD clips, not a held-out challenge estimate. One fold containing Grad-TTS and Pro-Diff remains difficult (normalized minDCF about 0.54 for the common-band model); the other folds are much easier. Treat 0.193 as a promising candidate result, not a guaranteed challenge score. The in-sample 64 kbps MP3 probe shows lower mean score movement for the common-band version (0.137 vs 0.278) and higher rank correlation (0.914 vs 0.802), but is only a stability diagnostic. Source and bandwidth mismatch remain risks. Compare against the holdout validation set before replacing the standard model.
+
+## Julia model with Arshiya LFCC inputs
+
+The merged evaluator tests Julia's 75/25 RBF-SVM/logistic model both on its original 84 features and on concatenated 84 baseline + 120 LFCC features. It also compares a fixed 7 kHz common-band version and single ExtraTrees candidates. All variants use the same five-fold speaker/generator-grouped splits and Hearsay minDCF costs; this changes the model's input evidence, rather than blending Julia and Arshiya output scores.
+
+```sh
+python scripts/evaluate_julia_lfcc.py --manifest data/train.csv
+```
+
+On the local 726-clip manifest, normalized grouped OOF minDCF was 0.293 for Julia's baseline SVM/logistic model, 0.230 after adding LFCCs, and 0.213 for its common-band LFCC version. The single common-band ExtraTrees model scored 0.191, the best pooled result; directly weighting training examples by the Hearsay error costs scored 0.199, so that change was not kept as the preferred candidate. One held-out fold remains difficult (about 0.51 minDCF for the best pooled candidate), so these numbers are candidate-selection evidence, not a challenge guarantee. Full details and artifacts are in `models/arshiya_julia_lfcc_validation.json`.
+
+Julia's saved optimized model was checked against locally available rows in the group list recorded in its report. The historical `models/arshiya_merged_holdout_validation.json` predates the Mini LibriSpeech retrieval and covers only 149 clips; it must not be treated as the full 293-clip holdout. The expanded-data grouped validation below is the current comparison.
+
+Score the opt-in common-band candidate in challenge template order with:
+
+```sh
+python -m hearsay predict-lfcc \
+  --model models/arshiya_lfcc_lowpass_candidate.joblib \
+  --input data/test --template data/HGT_Hearsay_score_template.csv \
+  --output predictions/Arshiya_lfcc_candidate.tsv
+```
+
+The Docker default now selects the expanded-data LFCC candidate; the Julia baseline remains available for direct comparison. Hidden test labels were not used.
+
+## External-source expansion and nested SVM check
+
+The recommended candidate uses real speech from OpenSLR Mini LibriSpeech SLR31 (`dev-clean-2`, CC BY 4.0) in addition to the supplied LJ Speech and DiffSSD data. Download the official 126 MB archive from [OpenSLR](https://openslr.org/31/), verify MD5 `6d7ab67ac6a1d2c993d050e16d61080d`, and build the expanded manifest:
+
+```sh
+mkdir -p data/external
+curl -fL https://openslr.trmal.net/resources/31/dev-clean-2.tar.gz -o data/external/dev-clean-2.tar.gz
+md5 data/external/dev-clean-2.tar.gz
+python scripts/add_librispeech_real.py --archive data/external/dev-clean-2.tar.gz --data data
+```
+
+The preparation selects up to 20 clips per speaker, keeps all 26 speaker IDs as separate groups, and balances 730 real clips (242 LJ + 488 LibriSpeech) with 730 DiffSSD clips across ten generator families. The audio archive, extracted audio, manifests, and feature caches are ignored by Git. Reproduce the LFCC model comparisons and paired corpus ablation with:
+
+```sh
+python scripts/evaluate_julia_lfcc.py --manifest data/train.csv \
+  --feature-cache data/librispeech_features.npz \
+  --report models/arshiya_librispeech_julia_lfcc_validation.json \
+  --raw-model models/arshiya_librispeech_julia_lfcc.joblib \
+  --lowpass-model data/research_julia_lfcc_lowpass.joblib \
+  --extra-trees-model data/research_extra_trees_lowpass_lfcc.joblib \
+  --cost-weighted-model data/research_costweighted.joblib
+python scripts/evaluate_librispeech_expansion.py --manifest data/train.csv \
+  --base-manifest data/train_pre_librispeech.csv \
+  --report models/arshiya_librispeech_expansion_comparison.json
+```
+
+On the identical five-fold speaker/generator-held-out evaluation, the Julia 84-feature baseline scored **0.2775 minDCF**; adding LFCCs to that same model scored **0.2084**. The common-band ExtraTrees options scored 0.2804 and did not transfer well to the expanded corpus. In the paired corpus ablation, adding LibriSpeech alone lowered minDCF from 0.7603 to 0.2202 on the same held-out clips; using the balanced expanded corpus scored 0.2057. This paired result reflects the added real-speaker diversity and additional balanced DiffSSD training examples. A nested SVM C-search had lower fold-adaptive OOF cost (0.1978), but its one final fixed-C model scored 0.2121 in full-corpus grouped OOF, so it was not selected. Re-run that experiment with:
+
+```sh
+python scripts/evaluate_lfcc_svm_tuning.py --manifest data/train.csv \
+  --feature-cache data/librispeech_features.npz \
+  --report models/arshiya_librispeech_lfcc_svm_tuning.json \
+  --model data/research_librispeech_lfcc_svm_tuned.joblib
+```
+
+Reports use Hearsay's `Pspoof=0.3`, `Cmiss=1`, and `Cfa=4`; no Hearsay test labels or score key were used.
+
+These external-source checks improve coverage of real-speaker variation, but the synthetic side remains DiffSSD. They are not a substitute for evaluation on a separate corpus containing both bona fide and spoof speech, such as the larger ASVspoof 5 corpus referenced by the challenge organizers.
+
+## Nested fusion experiment
+
+To assess Arshiya+Julia fusion without changing the default scorer, run:
+
+```sh
+python scripts/evaluate_fusion.py --manifest data/train.csv
+```
+
+This compares the acoustic baseline, Julia-style 5% metadata adjustment, temporal expert, fixed 50/50 fusion, and inner-fold-tuned weights using nested speaker/generator-grouped folds. It writes separate candidate artifacts (`models/arshiya_fusion_baseline.joblib`, `models/arshiya_fusion_temporal.joblib`, `models/arshiya_fusion_policy.json`) and a validation report. The fused predictor is opt-in:
+
+```sh
+python -m hearsay predict-fused \
+  --model models/arshiya_fusion_baseline.joblib \
+  --temporal-model models/arshiya_fusion_temporal.joblib \
+  --policy models/arshiya_fusion_policy.json \
+  --input data/test --template data/HGT_Hearsay_score_template.csv \
+  --output predictions/Arshiya_fused_predictions.tsv
+```
+
+Weight tuning was unstable across the current small folds, so the saved policy keeps the fixed 50/50 blend and Julia's 5% metadata prior; the nested tuned results remain in the report. This remains a candidate because LJ/DiffSSD source conditions differ from the challenge distribution. Hidden test labels are not used.
 
 Run the software smoke test with `python -m unittest discover -s tests -v`. Its generated tones only verify the pipeline; they do not estimate deepfake detection performance.
 

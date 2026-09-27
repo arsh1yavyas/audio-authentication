@@ -1,0 +1,143 @@
+{
+  "metric": "normalized minDCF; Pspoof=0.3, Cmiss=1, Cfa=4",
+  "score_direction": "larger means synthetic",
+  "clusterer": "qiskit",
+  "primary_score_column": "arshiya_score",
+  "secondary_score_column": "arshiya_spectral_score",
+  "score_source": "out-of-fold component scores; inspect provenance before use",
+  "folds": [
+    {
+      "fold": 1,
+      "test_groups": [
+        "real:LJ001",
+        "real:LJ003",
+        "real:LJ006",
+        "real:LJ014",
+        "real:LJ021",
+        "real:LJ024",
+        "real:LJ025",
+        "real:LJ026",
+        "real:LJ027",
+        "real:LJ033",
+        "real:LJ035",
+        "real:LJ036",
+        "real:LJ041",
+        "synthetic:xtts_v2",
+        "synthetic:your_tts"
+      ],
+      "global_blend_min_dcf": 0.0,
+      "conditional_min_dcf": 0.010416666666666666,
+      "global_alpha": 0.8
+    },
+    {
+      "fold": 2,
+      "test_groups": [
+        "real:LJ008",
+        "real:LJ017",
+        "real:LJ020",
+        "real:LJ022",
+        "real:LJ026",
+        "real:LJ028",
+        "real:LJ030",
+        "real:LJ032",
+        "real:LJ040",
+        "real:LJ044",
+        "real:LJ046",
+        "real:LJ048",
+        "real:LJ050",
+        "synthetic:xtts_v2",
+        "synthetic:your_tts"
+      ],
+      "global_blend_min_dcf": 0.0,
+      "conditional_min_dcf": 0.0,
+      "global_alpha": 0.75
+    },
+    {
+      "fold": 3,
+      "test_groups": [
+        "real:LJ002",
+        "real:LJ014",
+        "real:LJ015",
+        "real:LJ017",
+        "real:LJ019",
+        "real:LJ021",
+        "real:LJ022",
+        "real:LJ026",
+        "real:LJ027",
+        "real:LJ034",
+        "real:LJ049",
+        "real:LJ050",
+        "synthetic:diffgan_tts",
+        "synthetic:grad_tts",
+        "synthetic:playht"
+      ],
+      "global_blend_min_dcf": 0.6272353060260476,
+      "conditional_min_dcf": 0.7104730413658142,
+      "global_alpha": 0.8
+    },
+    {
+      "fold": 4,
+      "test_groups": [
+        "real:LJ012",
+        "real:LJ014",
+        "real:LJ017",
+        "real:LJ019",
+        "real:LJ024",
+        "real:LJ027",
+        "real:LJ032",
+        "real:LJ036",
+        "real:LJ041",
+        "real:LJ042",
+        "real:LJ048",
+        "synthetic:diffgan_tts",
+        "synthetic:elevenlabs",
+        "synthetic:grad_tts",
+        "synthetic:unit_speech"
+      ],
+      "global_blend_min_dcf": 0.4615384615384616,
+      "conditional_min_dcf": 0.4615384615384616,
+      "global_alpha": 1.0
+    },
+    {
+      "fold": 5,
+      "test_groups": [
+        "real:LJ004",
+        "real:LJ005",
+        "real:LJ006",
+        "real:LJ007",
+        "real:LJ010",
+        "real:LJ028",
+        "real:LJ029",
+        "real:LJ032",
+        "real:LJ037",
+        "real:LJ046",
+        "real:LJ047",
+        "real:LJ048",
+        "synthetic:grad_tts",
+        "synthetic:openvoicev2",
+        "synthetic:pro_diff"
+      ],
+      "global_blend_min_dcf": 0.5960127201565557,
+      "conditional_min_dcf": 0.6377201565557731,
+      "global_alpha": 0.25
+    }
+  ],
+  "mean_global_blend_min_dcf": 0.336957297544213,
+  "mean_conditional_min_dcf": 0.3640296652253431,
+  "final_router_training_summary": {
+    "p_spoof": 0.3,
+    "c_miss": 1.0,
+    "c_fa": 4.0,
+    "global_blend_alpha": 0.9,
+    "global_blend_min_dcf": 0.34615384615384615,
+    "conditional_min_dcf_in_sample": 0.3076923076923077,
+    "cluster_sizes": {
+      "0": 22,
+      "1": 8,
+      "2": 10
+    },
+    "cluster_method": "Qiskit fidelity quantum kernel + spectral clustering",
+    "note": "In-sample fit summary; compare using grouped out-of-fold predictions."
+  },
+  "artifact": "models/arshiya_quantum_router.joblib"
+}

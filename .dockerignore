@@ -6,3 +6,9 @@ tests
 scripts
 __pycache__
 *.pyc
+models/*
+!models/hearsay-optimized.joblib
+!models/hearsay-split.joblib
+!models/arshiya_julia_lfcc_lowpass.joblib
+!models/arshiya_lfcc_lowpass_candidate.joblib
+!models/arshiya_librispeech_julia_lfcc.joblib

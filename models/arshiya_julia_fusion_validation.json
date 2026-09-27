@@ -1,0 +1,46 @@
+{
+  "julia_branch_commit": "e0cf46f",
+  "dataset": "shared data/train.csv LJ/DiffSSD sample: 726 clips (242 real, 484 synthetic)",
+  "validation": "5-fold StratifiedGroupKFold; random_state=2026; speaker and generator groups held out; identical folds for all methods",
+  "metric": "normalized minDCF; Pspoof=0.3, Cmiss=1, Cfa=4",
+  "julia_metadata_real_weight": 0.05,
+  "metadata_status_counts": {
+    "consistent": 678,
+    "inconsistent": 48,
+    "unknown": 0
+  },
+  "results": {
+    "arshiya_audio_baseline": {
+      "normalized_minDCF": 0.380756,
+      "roc_auc": 0.871175,
+      "average_precision": 0.943262
+    },
+    "julia_metadata_adjusted_baseline": {
+      "normalized_minDCF": 0.376919,
+      "roc_auc": 0.871286,
+      "average_precision": 0.943345
+    },
+    "arshiya_temporal_only": {
+      "normalized_minDCF": 0.457202,
+      "roc_auc": 0.836444,
+      "average_precision": 0.928316
+    },
+    "julia_metadata_plus_arshiya_temporal_50_50": {
+      "normalized_minDCF": 0.348583,
+      "roc_auc": 0.866684,
+      "average_precision": 0.943073
+    },
+    "audio_baseline_plus_temporal_50_50": {
+      "normalized_minDCF": 0.356848,
+      "roc_auc": 0.866753,
+      "average_precision": 0.943030
+    }
+  },
+  "blend_weights": "fixed 50/50; no weight or threshold tuning on these validation labels",
+  "notes": [
+    "The Julia branch adds a small score adjustment for structurally consistent metadata. Its acoustic random forest uses the same feature and model family as Arshiya.",
+    "The Arshiya temporal model is weaker alone but improves minDCF in a fixed equal-weight blend on these grouped OOF scores.",
+    "This is a shared LJ/DiffSSD sample, not the larger Julia training manifest or the hidden challenge test set. Treat the small gains as provisional.",
+    "OOF scores were generated from the same five group folds; the Julia metadata analysis and adjustment came from origin/julia commit e0cf46f."
+  ]
+}

@@ -1,0 +1,265 @@
+{
+  "samples": 1460,
+  "real": 730,
+  "synthetic": 730,
+  "groups": 86,
+  "feature_count": 204,
+  "metric": "normalized minDCF; Pspoof=.3, Cmiss=1, Cfa=4",
+  "validation": "Nested 5-fold outer / 3-fold inner StratifiedGroupKFold; random_state=2026 for outer folds",
+  "model_search": {
+    "candidates": [
+      0.1,
+      0.3,
+      1.0,
+      3.0,
+      10.0
+    ],
+    "gamma": "scale",
+    "class_weight": "balanced",
+    "selection_metric": "pooled inner OOF normalized minDCF"
+  },
+  "out_of_fold_results": {
+    "nested_tuned_single_svm": {
+      "normalized_minDCF": 0.19784735812133075,
+      "minDCF_threshold": 0.6136352020369416,
+      "roc_auc": 0.9741565021580033,
+      "average_precision": 0.976944670804617
+    },
+    "fixed_julia_75_25_svm_logistic": {
+      "normalized_minDCF": 0.2068493150684931,
+      "minDCF_threshold": 0.6960213445944811,
+      "roc_auc": 0.9626271345468193,
+      "average_precision": 0.9690363014988785
+    }
+  },
+  "fold_details": [
+    {
+      "fold": 1,
+      "held_out_groups": [
+        "real:LJ001",
+        "real:LJ003",
+        "real:LJ004",
+        "real:LJ007",
+        "real:LJ012",
+        "real:LJ018",
+        "real:LJ021",
+        "real:LJ036",
+        "real:LJ043",
+        "real:LJ047",
+        "real:libri:174",
+        "real:libri:2412",
+        "real:libri:5338",
+        "real:libri:5694",
+        "real:libri:5895",
+        "synthetic:diffgan_tts",
+        "synthetic:wavegrad2"
+      ],
+      "selected_c": 3.0,
+      "inner_grouped_minDCF_by_c": {
+        "0.1": 0.3317025440313111,
+        "0.3": 0.2666340508806262,
+        "1.0": 0.23948140900195697,
+        "3.0": 0.23116438356164382,
+        "10.0": 0.23409980430528374
+      },
+      "held_out_samples": 292,
+      "tuned_svm": {
+        "normalized_minDCF": 0.04892367906066536,
+        "minDCF_threshold": 0.6638826499101951,
+        "roc_auc": 0.9965284293488459,
+        "average_precision": 0.995941934694388
+      },
+      "fixed_julia_svm_logistic": {
+        "normalized_minDCF": 0.06066536203522504,
+        "minDCF_threshold": 0.6813573639119066,
+        "roc_auc": 0.9948864702570839,
+        "average_precision": 0.9934885233628217
+      }
+    },
+    {
+      "fold": 2,
+      "held_out_groups": [
+        "real:LJ002",
+        "real:LJ009",
+        "real:LJ026",
+        "real:LJ028",
+        "real:LJ029",
+        "real:LJ038",
+        "real:LJ040",
+        "real:LJ041",
+        "real:LJ042",
+        "real:LJ050",
+        "real:libri:1272",
+        "real:libri:251",
+        "real:libri:3752",
+        "real:libri:6241",
+        "real:libri:8842",
+        "synthetic:openvoicev2",
+        "synthetic:your_tts"
+      ],
+      "selected_c": 3.0,
+      "inner_grouped_minDCF_by_c": {
+        "0.1": 0.4204990215264188,
+        "0.3": 0.39677103718199613,
+        "1.0": 0.37548923679060664,
+        "3.0": 0.36668297455968685,
+        "10.0": 0.3681506849315069
+      },
+      "held_out_samples": 292,
+      "tuned_svm": {
+        "normalized_minDCF": 0.03033268101761252,
+        "minDCF_threshold": 0.6136352020369416,
+        "roc_auc": 0.9983111277913305,
+        "average_precision": 0.998241282136209
+      },
+      "fixed_julia_svm_logistic": {
+        "normalized_minDCF": 0.023483365949119372,
+        "minDCF_threshold": 0.6863575828085835,
+        "roc_auc": 0.9989679114280352,
+        "average_precision": 0.9989228466972538
+      }
+    },
+    {
+      "fold": 3,
+      "held_out_groups": [
+        "real:LJ010",
+        "real:LJ015",
+        "real:LJ016",
+        "real:LJ017",
+        "real:LJ027",
+        "real:LJ035",
+        "real:LJ039",
+        "real:LJ044",
+        "real:LJ046",
+        "real:LJ049",
+        "real:libri:3000",
+        "real:libri:3536",
+        "real:libri:777",
+        "real:libri:8297",
+        "real:libri:84",
+        "synthetic:grad_tts",
+        "synthetic:unit_speech"
+      ],
+      "selected_c": 0.1,
+      "inner_grouped_minDCF_by_c": {
+        "0.1": 0.36007827788649704,
+        "0.3": 0.3811154598825832,
+        "1.0": 0.37646771037182,
+        "3.0": 0.38087084148727984,
+        "10.0": 0.38087084148727984
+      },
+      "held_out_samples": 292,
+      "tuned_svm": {
+        "normalized_minDCF": 0.5048923679060665,
+        "minDCF_threshold": 0.32361378264017066,
+        "roc_auc": 0.8709185588290486,
+        "average_precision": 0.8891660836274946
+      },
+      "fixed_julia_svm_logistic": {
+        "normalized_minDCF": 0.4863013698630137,
+        "minDCF_threshold": 0.729064008430913,
+        "roc_auc": 0.8910208294239069,
+        "average_precision": 0.8990717973733993
+      }
+    },
+    {
+      "fold": 4,
+      "held_out_groups": [
+        "real:LJ006",
+        "real:LJ008",
+        "real:LJ013",
+        "real:LJ014",
+        "real:LJ020",
+        "real:LJ024",
+        "real:LJ025",
+        "real:LJ031",
+        "real:LJ034",
+        "real:LJ037",
+        "real:libri:1988",
+        "real:libri:1993",
+        "real:libri:2803",
+        "real:libri:6295",
+        "real:libri:6319",
+        "real:libri:7850",
+        "synthetic:playht",
+        "synthetic:pro_diff"
+      ],
+      "selected_c": 3.0,
+      "inner_grouped_minDCF_by_c": {
+        "0.1": 0.8397749510763208,
+        "0.3": 0.8436888454011743,
+        "1.0": 0.8409980430528374,
+        "3.0": 0.8395303326810176,
+        "10.0": 0.8395303326810176
+      },
+      "held_out_samples": 292,
+      "tuned_svm": {
+        "normalized_minDCF": 0.07338551859099804,
+        "minDCF_threshold": 0.7622317630151713,
+        "roc_auc": 0.9965753424657534,
+        "average_precision": 0.9968257904318756
+      },
+      "fixed_julia_svm_logistic": {
+        "normalized_minDCF": 0.04794520547945205,
+        "minDCF_threshold": 0.727158790307572,
+        "roc_auc": 0.997888909739163,
+        "average_precision": 0.9979979727769501
+      }
+    },
+    {
+      "fold": 5,
+      "held_out_groups": [
+        "real:LJ005",
+        "real:LJ011",
+        "real:LJ019",
+        "real:LJ022",
+        "real:LJ023",
+        "real:LJ030",
+        "real:LJ032",
+        "real:LJ033",
+        "real:LJ045",
+        "real:LJ048",
+        "real:libri:1462",
+        "real:libri:2035",
+        "real:libri:2428",
+        "real:libri:3576",
+        "real:libri:7976",
+        "synthetic:elevenlabs",
+        "synthetic:xtts_v2"
+      ],
+      "selected_c": 10.0,
+      "inner_grouped_minDCF_by_c": {
+        "0.1": 0.42563600782778865,
+        "0.3": 0.34442270058708413,
+        "1.0": 0.3175146771037182,
+        "3.0": 0.3126223091976517,
+        "10.0": 0.31090998043052837
+      },
+      "held_out_samples": 292,
+      "tuned_svm": {
+        "normalized_minDCF": 0.18688845401174167,
+        "minDCF_threshold": 0.14315575938718086,
+        "roc_auc": 0.979311315443798,
+        "average_precision": 0.9792752042865467
+      },
+      "fixed_julia_svm_logistic": {
+        "normalized_minDCF": 0.22602739726027396,
+        "minDCF_threshold": 0.15788227663662185,
+        "roc_auc": 0.9689904297241508,
+        "average_precision": 0.9702287026844734
+      }
+    }
+  ],
+  "final_model": {
+    "selected_c_from_full_grouped_oof": 10.0,
+    "full_grouped_oof_minDCF_by_c": {
+      "0.1": 0.25577299412915855,
+      "0.3": 0.22289628180039137,
+      "1.0": 0.21604696673189822,
+      "3.0": 0.21350293542074367,
+      "10.0": 0.21213307240704504
+    },
+    "artifact": "data/research_librispeech_lfcc_svm_tuned.joblib"
+  },
+  "caveat": "The external LibriSpeech source contributes bona fide speech only; spoof clips remain from DiffSSD. OOF estimates are for model selection and may not predict the separate Hearsay challenge set."
+}

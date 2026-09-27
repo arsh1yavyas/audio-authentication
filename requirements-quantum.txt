@@ -1,0 +1,3 @@
+# Optional offline clustering experiment only; not installed in the Docker scorer.
+qiskit==2.1.2
+qiskit-machine-learning==0.9.1
