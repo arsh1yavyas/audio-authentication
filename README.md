@@ -60,6 +60,32 @@ flowchart TD
     I --> J[TSV filename and cm-score]
 ```
 
+## What Did And Didn't Work
+
+### Worked
+
+* **Concatenating LFCC Features (204-Feature Vector):** Combining 120 linear-frequency cepstral coefficients (static, delta, and delta-delta statistics) with the 84 baseline acoustic features lowered the mean training minDCF from 0.496 to 0.317 and improved holdout minDCF from 0.130 to 0.075 (local approximations).
+
+* **75/25 Hybrid Classifier:** Blending predictions from a standardized Radial Basis Function (RBF) SVM (75% weight) and Logistic Regression (25% weight) consistently outperformed standalone forest models across grouped cross-validation splits.
+
+* **External Dataset Expansion (Mini LibriSpeech):** Incorporating 26 bona fide speakers from OpenSLR Mini LibriSpeech reduced narrator bias from the single-speaker LJ Speech corpus and improved cross-speaker generalization.
+
+* **Correcting the minDCF Objective Formula:** Aligning score-evaluation metrics and cost-sensitive training directly with the challenge's operating priors (70% real, 30% synthetic, $4\times$ false alarm cost) resolved threshold selection errors present in earlier iterations.
+
+### Didn't Fully Work
+
+* **Header & Signal-Level Encoding Models:** We were using container headers and signal quantization/spectral cutoff traces as direct authenticity classifiers. But, we changed this since the training real audio clips came from LJ Speech (recorded at a 16 kHz sample rate), while synthetic clips came from DiffSSD generators (which had a median source rate of 22.05 kHz). This led to the encoding models associating those frequencies with the respective audio type, leading to signal correlation dropping sharply (to 0.79) after lossy MP3 re-encoding (signal changing). Plus, we wanted to rely less on header information since clean headers are easily forged.
+
+* **Output Score Blending Across Independent Experts:** We were fusing separate classifier output scores from different feature experts. But, passing all 204 acoustic and LFCC features directly into a single combined SVM/Logistic Regression model yielded lower minDCF and superior decision boundaries compared to multi-model score averaging.
+
+* **Standalone Temporal Dynamics Model:** We were tracking frame-level energy, zero-crossing, and spectral shape changes across eight sequential time windows. We changed this since on the unseen-attack ASVspoof 5 benchmark, the temporal model performed weakly on its own and failed to deliver consistent gains when blended into the main classifier.
+
+* **Unsupervised K-Means Quality-Condition Routing:** At first, we dynamically altered model blend weights based on quality clusters (clipping, activity, spectral flatness). But, routing provided negligible minDCF gains on sampled development sets (improving cost only from 0.3677 to 0.3647) and proved beneficial in only one out of five cross-validation folds, making it too brittle for primary deployment.
+
+* **Quantum Clustering (Qiskit Experiment):** We really wanted to use quantum fidelity kernels and spectral clustering for quality-vector routing. However, high cluster agreement (ARI/NMI) with ordinary K-means did not translate to higher detection accuracy, and requiring Qiskit dependencies would needlessly bloat the CPU-friendly Docker image.
+
+* **84-Feature MinDCF Retuned Model:** We tried out a re-tuned version of the original 84-feature baseline. But, while it showed slight gains on training partitions, it performed worse on exploratory holdout data compared to the existing baseline. On the other hand, the 204-feature LFCC architecture won across all partitions.
+  
 ## Installation & Usage
 
 ### Prerequisites & Setup
